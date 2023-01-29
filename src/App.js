@@ -5,6 +5,10 @@ import GlobalStyles from "./styles/GlobalStyles";
 import Leaflet from "./components/Leaflet";
 import SearchCard from "./components/SearchCard";
 import axios from "axios";
+import regions from './data/doubs.json'
+import new_regions from './data/nouvelles_regions.json'
+import departments from './data/departements.json'
+// import communes from './data/communes.json'
 
 function App() {
     const [selected, setSelected] = React.useState({
@@ -20,30 +24,17 @@ function App() {
     })
 
     const [datas, setDatas] = React.useState({
-        new_regions: [],
-        regions: [],
-        departments: [],
+        new_regions: new_regions,
+        regions: regions,
+        departments: departments,
         communes: []
     })
 
     React.useEffect(() => {
-        const fetchDatas = async () => {
-            try {
-                const regions = await axios.get(`${process.env.REACT_APP_API_URL}api/regions/geolocation/all`)
-                const departments = await axios.get(`${process.env.REACT_APP_API_URL}api/departments/geolocation/all`)
-                const new_regions = await axios.get(`${process.env.REACT_APP_API_URL}api/regions/new/geolocation/all`)
-                setDatas(state => ({
-                    ...state,
-                    new_regions: new_regions.data,
-                    regions: regions.data,
-                    departments: departments.data,
-                }))
-            } catch (err) {
-                console.log(err)
-            }
-        }
-        fetchDatas()
-    }, [selected])
+        axios.get(`${process.env.REACT_APP_API_URL}api/locations/`)
+            .then(res => console.log(res.data.filter(e => e.fields.dep_nom === 'Jura')))
+            .catch(err => console.log(err))
+    }, [])
 
     return (
         <DatasContext.Provider value={{ datas, setDatas }}>
