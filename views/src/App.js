@@ -1,11 +1,10 @@
 import React from "react";
-import { GeoJSONContext, LoadingContext, SearchContext, SelectionContext } from "./AppContext";
 import styled from "styled-components";
+import { GeoJSONContext, LoadingContext, SearchContext, SelectionContext } from "./AppContext";
 import GlobalStyles from "./styles/GlobalStyles";
 import Leaflet from "./components/Leaflet";
 import SearchCard from "./components/SearchCard";
 import { geojsons } from "./components/functions/imports";
-import axios from "axios";
 
 function App() {
     const [selected, setSelected] = React.useState({
