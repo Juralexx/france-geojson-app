@@ -1,20 +1,26 @@
 import React from 'react'
 import styled from 'styled-components'
-import { SearchContext, SelectionContext } from '../AppContext'
+import { GeoJSONContext, LoadingContext, SearchContext, SelectionContext } from '../AppContext'
 import Icon from './tools/icons/Icon'
 import { ClassicInput } from './tools/Input'
 import { addClass } from './Utils'
+import SemiCicle from './loader/SemiCicle'
+import { geojsons } from './functions/imports'
+import { getZoom } from './functions/functions'
 
 const SearchCard = () => {
-    const { selected, setSelected } = React.useContext(SelectionContext)
+    const { selected, setSelected, arborescence } = React.useContext(SelectionContext)
     const { search, setSearch } = React.useContext(SearchContext)
+    const { setGeoJSON, setLeaflet } = React.useContext(GeoJSONContext)
+    const { isLoading, setLoading } = React.useContext(LoadingContext)
     const inputRef = React.useRef()
+
+    const tabs = ['France', 'Régions', 'Anciennes régions', 'Départements']
 
     return (
         <SearchContainer>
             <SearchInput>
-                <Icon
-                    name="Menu"
+                <Icon name="Menu"
                     className="menu-svg"
                 />
                 <ClassicInput
@@ -25,44 +31,68 @@ const SearchCard = () => {
                     onInput={e => setSearch(data => ({ ...data, query: e.target.value }))}
                     onChange={() => { }}
                 />
-                {!search.query.length > 0 ? (
-                    <Icon
-                        name="Search"
-                        className="search-svg"
-                        onClick={() => inputRef.current.focus()}
-                    />
+                {search.query.length > 0 ? (
+                    <Icon name="Cross" className="search-svg" onClick={() => setSearch(data => ({ ...data, query: '' }))} />
                 ) : (
-                    <Icon
-                        name="Cross"
-                        className="search-svg"
-                        onClick={() => setSearch(data => ({ ...data, query: '' }))}
-                    />
+                    <Icon name="Search" className="search-svg" onClick={() => inputRef.current.focus()} />
                 )}
             </SearchInput>
-            <SelectionList>
-                <h1>France</h1>
-                <div
-                    className={`list-choice ${addClass(selected.type === 'all' && selected.name === 'departments', 'active')}`}
-                    onClick={() => setSelected(prevState => ({ ...prevState, type: 'all', name: 'departments' }))}
-                >
-                    {selected.type === 'all' && selected.name === 'departments' ? <Icon name="Spinner" /> : <Icon name="Point" />}
-                    Départements
-                </div>
-                <div
-                    className={`list-choice ${addClass(selected.type === 'all' && selected.name === 'regions', 'active')}`}
-                    onClick={() => setSelected(prevState => ({ ...prevState, type: 'all', name: 'regions' }))}
-                >
-                    {selected.type === 'all' && selected.name === 'regions' ? <Icon name="Spinner" /> : <Icon name="Point" />}
-                    Régions
-                </div>
-                <div
-                    className={`list-choice ${addClass(selected.type === 'all' && selected.name === 'new_regions', 'active')}`}
-                    onClick={() => setSelected(prevState => ({ ...prevState, type: 'all', name: 'new_regions' }))}
-                >
-                    {selected.type === 'all' && selected.name === 'new_regions' ? <Icon name="Spinner" /> : <Icon name="Point" />}
-                    Nouvelles régions
-                </div>
-            </SelectionList>
+            {selected.type === 'all' ? (
+                <SelectionList>
+                    <h1>France</h1>
+                    {tabs.map((tab, i) => {
+                        return (
+                            <div className={`list-choice ${addClass(selected.name === tab, 'active')}`}
+                                key={i}
+                                onClick={() => {
+                                    setGeoJSON(geojsons[tab])
+                                    setSelected(prev => ({ ...prev, type: 'all', name: tab }))
+                                    setLoading(true)
+                                    setLeaflet({ zoomAction: 'zoomOut', zoom: 6 })
+                                }}
+                            >
+                                {selected.name === tab ? (
+                                    isLoading ? <SemiCicle /> : <Icon name="Spinner" className="icon" />
+                                ) : (
+                                    <Icon name="Point" className="icon" />
+                                )}
+                                {tab}
+                            </div>
+                        )
+                    })}
+                </SelectionList>
+            ) : (
+                <SelectionList>
+                    <div className='previous' onClick={() => {
+                        setGeoJSON(arborescence[0].value)
+                        setLeaflet({ zoomAction: 'zoomOut', zoom: getZoom(arborescence[0].name) })
+                    }}>
+                        <Icon name="DoubleArrowLeft" />
+                        {arborescence[0].previous}
+                    </div>
+                    <h2>{arborescence[1].name}</h2>
+                    {arborescence.slice(2).map((tab, i) => {
+                        console.log(tab.value)
+                        return (
+                            <div className={`list-choice ${addClass(selected.name === tab.name, 'active')}`}
+                                key={i}
+                                onClick={() => {
+                                    setGeoJSON(tab.value)
+                                    setSelected(prev => ({ ...prev, type: 'precise', name: tab.name }))
+                                    setLoading(true)
+                                }}
+                            >
+                                {selected.name === tab.name ? (
+                                    isLoading ? <SemiCicle /> : <Icon name="Spinner" className="icon" />
+                                ) : (
+                                    <Icon name="Point" className="icon" />
+                                )}
+                                {tab.name}
+                            </div>
+                        )
+                    })}
+                </SelectionList>
+            )}
         </SearchContainer>
     )
 }
@@ -103,13 +133,38 @@ const SelectionList = styled.div`
     border-radius    : var(--rounded-sm);
     box-shadow       : var(--shadow-smooth), var(--shadow-relief);
     padding          : 10px 0;
+    max-width        : 350px;
 
     h1 {
-        font-size   : 30px;
+        font-size   : 28px;
         font-weight : 700;
         margin      : 0;
         padding     : 15px 30px;
         color       : var(--title);
+    }
+
+    h2 {
+        font-size   : 22px;
+        font-weight : 700;
+        margin      : 0;
+        padding     : 15px 30px;
+        color       : var(--title);
+    }
+
+    .previous {
+        display        : flex;
+        align-items    : center;
+        padding        : 0 28px;
+        text-transform : uppercase;
+        line-height    : 16px;
+        color          : var(--secondary);
+        cursor         : pointer;
+        svg {
+            margin-right : 7px;
+        }
+        &:hover {
+            color : var(--primary);
+        }
     }
 
     .list-choice {
@@ -120,7 +175,7 @@ const SelectionList = styled.div`
         border-left : 4px solid transparent;
         cursor      : pointer;
 
-        svg {
+        .icon {
             position  : absolute;
             left      : 40px;
             top       : 50%;
@@ -134,9 +189,24 @@ const SelectionList = styled.div`
             color            : var(--primary);
             background-color : var(--content-light);
             border-color     : var(--primary);
-
             svg {
                 color : var(--primary);
+            }
+        }
+
+        .circle-loader {
+            position  : absolute;
+            left      : 40px;
+            top       : 50%;
+            transform : translateY(-50%);
+            width     : 20px;
+            height    : 20px;
+            svg {
+                width  : 20px;
+                height : 20px;
+                circle {
+                    stroke-width : 4px;
+                }
             }
         }
 

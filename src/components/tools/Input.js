@@ -36,11 +36,11 @@ export const ClassicInput = (props) => {
             />
             {cross &&
                 ((value || defaultValue) &&
-                    (value?.length > 0 || defaultValue?.length > 0)) && (
-                    <div onClick={onClean} className="svg_container">
-                        <Icon name="Cross" className="cross" />
-                    </div>
-                )}
+                    (value?.length > 0 || defaultValue?.length > 0)) &&
+                <div onClick={onClean} className="svg_container">
+                    <Icon name="Cross" className="cross" />
+                </div>
+            }
         </InputClassic>
     )
 }

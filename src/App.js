@@ -1,53 +1,45 @@
 import React from "react";
-import { DatasContext, SearchContext, SelectionContext } from "./AppContext";
+import { GeoJSONContext, LoadingContext, SearchContext, SelectionContext } from "./AppContext";
 import styled from "styled-components";
 import GlobalStyles from "./styles/GlobalStyles";
 import Leaflet from "./components/Leaflet";
 import SearchCard from "./components/SearchCard";
-import axios from "axios";
-import regions from './data/doubs.json'
-import new_regions from './data/nouvelles_regions.json'
-import departments from './data/departements.json'
-// import communes from './data/communes.json'
+import { geojsons } from "./components/functions/imports";
 
 function App() {
     const [selected, setSelected] = React.useState({
-        type: 'all', // 'all' or 'precise'
-        name: 'regions', // 'regions', 'new_regions' or 'departments'
+        type: 'all',
+        name: 'Régions' // France, Régions, Anciennes Régions, Arrodissements, Cantons, Communes
     })
+    const [arborescence, setArborescence] = React.useState([])
 
-    const [search, setSearch] = React.useState({
-        state: false,
-        query: '',
-        results: [],
-        isLoading: false
-    })
+    const [search, setSearch] = React.useState({ state: false, query: '', results: [], isLoading: false })
 
-    const [datas, setDatas] = React.useState({
-        new_regions: new_regions,
-        regions: regions,
-        departments: departments,
-        communes: []
-    })
+    const [geoJSON, setGeoJSON] = React.useState(geojsons['Régions'])
+    const [leaflet, setLeaflet] = React.useState({ zoomAction: '', zoom: 6 })
+    const [isLoading, setLoading] = React.useState(true)
 
     React.useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_URL}api/locations/`)
-            .then(res => console.log(res.data.filter(e => e.fields.dep_nom === 'Jura')))
-            .catch(err => console.log(err))
-    }, [])
+        if (isLoading) {
+            const timer = setTimeout(() => setLoading(false), 1000)
+            return () => clearTimeout(timer)
+        }
+    }, [isLoading])
 
     return (
-        <DatasContext.Provider value={{ datas, setDatas }}>
-            <SelectionContext.Provider value={{ selected, setSelected }}>
+        <GeoJSONContext.Provider value={{ geoJSON, setGeoJSON, leaflet, setLeaflet }}>
+            <SelectionContext.Provider value={{ selected, setSelected, arborescence, setArborescence }}>
                 <SearchContext.Provider value={{ search, setSearch }}>
-                    <RootContainer >
-                        <GlobalStyles />
-                        <Leaflet />
-                        <SearchCard />
-                    </RootContainer>
+                    <LoadingContext.Provider value={{ isLoading, setLoading }}>
+                        <RootContainer >
+                            <GlobalStyles />
+                            <Leaflet />
+                            <SearchCard />
+                        </RootContainer>
+                    </LoadingContext.Provider>
                 </SearchContext.Provider>
             </SelectionContext.Provider>
-        </DatasContext.Provider>
+        </GeoJSONContext.Provider>
     );
 }
 

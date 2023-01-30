@@ -11,8 +11,10 @@ const variables = css`
         --primary-light     : #3D70C5;
         --primary-light-rgb : 36, 89, 178;
 
-        --secondary     : #e11a81;
-        --secondary-rgb : 225, 26, 129;
+        --secondary           : #e11a81;
+        --secondary-rgb       : 225, 26, 129;
+        --secondary-light     : #E43E94;
+        --secondary-light-rgb : 228, 62, 148;
 
         --slate            : #8892b0;
         --slate-rgb        : 136, 146, 176;

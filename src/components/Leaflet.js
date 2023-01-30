@@ -1,37 +1,77 @@
 import React from 'react'
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
-import { randomNbLtID } from './Utils'
-import SemiCicle from './loader/SemiCicle'
 import styled from 'styled-components';
-import { DatasContext, SearchContext, SelectionContext } from '../AppContext';
+import { GeoJSONContext, SelectionContext } from '../AppContext';
+import { departments, getZoom, old_regions, regions } from './functions/functions'
+import { geojsons } from './functions/imports';
 
 const Leaflet = () => {
-    const { selected, setSelected } = React.useContext(SelectionContext)
-    const { search, setSearch } = React.useContext(SearchContext)
-    const { datas, setDatas } = React.useContext(DatasContext)
+    const defaultCenter = [46.873467013745916, 2.5836305570248217]
 
-    const [isLoading, setLoading] = React.useState(false)
-    const [geoJSON, setGeoJSON] = React.useState(datas.regions)
+    const { selected, setSelected, arborescence, setArborescence } = React.useContext(SelectionContext)
+    const { geoJSON, setGeoJSON, leaflet, setLeaflet } = React.useContext(GeoJSONContext)
 
-    React.useEffect(() => {
-        if (datas.regions) {
-            setGeoJSON(datas.new_regions)
+    const findGeoJSON = (property) => {
+        if (regions.includes(property)) {
+            const region = geojsons[property]
+            setGeoJSON(region['GeoJSON'])
+            setArborescence([{
+                previous: 'France',
+                value: geojsons['France']
+            }, {
+                name: property,
+                value: region['GeoJSON']
+            }, {
+                name: 'Départements',
+                value: region['Départements'],
+            }, {
+                name: 'Arrondissements',
+                value: region['Arrondissements'],
+            }, {
+                name: 'Cantons',
+                value: region['Cantons'],
+            }, {
+                name: 'Communes',
+                value: region['Communes'],
+            }])
         }
-    }, [datas.regions])
+    }
 
     const ReturnGeoJSON = () => {
         const map = useMap()
-        const zoomToFeature = e => map.fitBounds(e.target.getBounds());
+
+        const zoomToFeature = (event, layer) => {
+            let zm = getZoom(selected.type)
+            const { lat, lng } = event.target.getCenter()
+            const nom = layer.feature.properties.nom
+
+            if (regions.includes(nom) || old_regions.includes(nom)) {
+                setSelected(prev => ({ ...prev, type: 'precise', name: 'Régions' }))
+                map.flyTo([lat, (lng - 0.5)], 8)
+            } else if (departments.includes(nom)) {
+                setSelected(prev => ({ ...prev, type: 'precise', name: 'Départements' }))
+                map.flyTo([lat, (lng - 0.5)], 10)
+            } else {
+                map.flyTo([lat, (lng - 0.5)], 6)
+            }
+        }
+
+        React.useEffect(() => {
+            if (leaflet.zoomAction === 'zoomOut') {
+                map.flyTo(defaultCenter, leaflet.zoom)
+            }
+        }, [leaflet])
 
         return (
             <GeoJSON
-                data={datas.regions}
-                key={randomNbLtID(10)}
+                data={geoJSON}
                 onEachFeature={(__, layer) => {
                     layer.on({
-                        click: e => {
-                            zoomToFeature(e)
+                        click: (event) => {
+                            setLeaflet({ zoomAction: 'zoomIn', zoom: getZoom(selected.type) })
+                            zoomToFeature(event, layer)
+                            findGeoJSON(layer.feature.properties.nom)
                         }
                     });
                 }}
@@ -41,50 +81,22 @@ const Leaflet = () => {
 
     return (
         <LeafletContainer>
-            {!isLoading ? (
-                <MapContainer
-                    key={null}
-                    center={[46.873467013745916, 2.5836305570248217]}
-                    zoom={6}
-                    minZoom={6}
-                    whenCreated={map => setInterval(() => { map.invalidateSize() }, 100)}
-                    style={{ width: '100vw', height: '100vh' }}
-                >
-                    <TileLayer
-                        attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                    />
-                        <ReturnGeoJSON />
-                </MapContainer>
-            ) : (
-                <MapContainer
-                    center={[46.873467013745916, 2.5836305570248217]}
-                    zoom={5}
-                    minZoom={5}
-                    maxZoom={5}
-                    dragging="false"
-                    style={{ width: '100vw', height: '100vh' }}
-                >
-                    <TileLayer
-                        attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                    />
-                    <LoaderContainer>
-                        <SemiCicle style={{
-                            position: "absolute",
-                            top: "50%",
-                            left: "50%",
-                            transform: "translate(-50%, -50%)",
-                            width: 60,
-                            height: 60,
-                            zIndex: 3000
-                        }}
-                            strokeWidth="4"
-                            stroke="rgba(0, 0, 0, 1)"
-                        />
-                    </LoaderContainer>
-                </MapContainer>
-            )}
+            <MapContainer
+                key={null}
+                center={[46.873467013745916, 2.5836305570248217]}
+                zoom={leaflet.zoom}
+                minZoom={6}
+                whenCreated={map => setInterval(() => map.invalidateSize(), 100)}
+                style={{ width: '100vw', height: '100vh' }}
+            >
+                <TileLayer
+                    attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                />
+                {Object.keys(geoJSON).length > 0 &&
+                    <ReturnGeoJSON />
+                }
+            </MapContainer>
         </LeafletContainer>
     )
 }
@@ -104,12 +116,12 @@ const LeafletContainer = styled.div`
         display : none;
     }
     .leaflet-interactive {
-        stroke         : var(--primary-light);
-        fill           : var(--primary);
-        fill-opacity   : 0.3;
+        stroke       : var(--primary-light);
+        fill         : var(--primary-light);
+        fill-opacity : 0.3;
 
         &:hover {
-            fill-opacity: 0.5;
+            fill-opacity : 0.5;
         }
     }
 `
