@@ -7,17 +7,14 @@ import SearchCard from "./components/SearchCard";
 import { geojsons } from "./components/functions/imports";
 
 function App() {
-    const [selected, setSelected] = React.useState({
-        level: 1,
-        name: 'Régions' // France, Régions, Anciennes Régions, Arrodissements, Cantons, Communes
-    })
+    const [selected, setSelected] = React.useState({ level: 0, name: 'Régions' }) // France, Régions, Anciennes Régions, Arrodissements, Cantons, Communes
     const [arborescence, setArborescence] = React.useState([])
 
     const [search, setSearch] = React.useState({ state: false, query: '', results: [], isLoading: false })
 
     const [geoJSON, setGeoJSON] = React.useState(geojsons['Régions'])
     const [leaflet, setLeaflet] = React.useState({ zoomAction: '', zoom: 6 })
-    const [isLoading, setLoading] = React.useState(true)
+    const [isLoading, setLoading] = React.useState(false)
 
     React.useEffect(() => {
         if (isLoading) {

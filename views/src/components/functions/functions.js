@@ -1,9 +1,12 @@
+import { departements_regions, departments, old_regions, regions } from "./api"
+import { geojsons } from "./imports"
+
 export const getZoom = (selectedType) => {
-    if (selectedType === 'France' || selectedType === 'Régions' || selectedType === 'Régions')
+    if (selectedType === 'France' || selectedType === 'Régions' || selectedType === 'Anciennes régions')
         return 6
     else if (selectedType === 'Départements')
         return 9
-    else if (selectedType === 'Arrondissement')
+    else if (selectedType === 'Arrondissements')
         return 11
     else if (selectedType === 'Cantons')
         return 12
@@ -14,547 +17,176 @@ export const getZoom = (selectedType) => {
     else if (old_regions.includes(selectedType))
         return 8
     else if (departments.includes(selectedType))
-        return 10
+        return 9
     else
         return 6
 }
 
+/**
+ * 
+ */
+
 export const getLevel = (selectedLevel) => {
-    switch (selectedLevel) {
-        case 'France':
-            return 1
-        case 'Régions':
-            return 2
-        case 'Anciennes régions':
-            return 2
-        case 'Départements':
-            return 3
-        case 'Arrondissement':
-            return 4
-        case 'Cantons':
-            return 5
-        case 'Communes':
-            return 6
+    if (selectedLevel === 'France')
+        return 0
+    else if (selectedLevel === 'Régions')
+        return 1
+    else if (selectedLevel === 'Région')
+        return 1
+    else if (selectedLevel === 'Anciennes régions')
+        return 1
+    else if (selectedLevel === 'Départements')
+        return 2
+    else if (selectedLevel === 'Département')
+        return 2
+    else if (selectedLevel === 'Arrondissements')
+        return 3
+    else if (selectedLevel === 'Cantons')
+        return 4
+    else if (selectedLevel === 'Communes')
+        return 5
+    else if (regions.includes(selectedLevel))
+        return 1
+    else if (old_regions.includes(selectedLevel))
+        return 1
+    else if (departments.includes(selectedLevel))
+        return 2
+    else
+        return 0
+}
+
+/**
+ * 
+ */
+
+export const getArborescence = (type, name) => {
+    switch (type) {
+        case 'Régions': {
+            const region = geojsons[name]
+            return (
+                [{
+                    previous: 'Régions',
+                    value: geojsons['Régions']
+                }, {
+                    name: name,
+                    value: region['GeoJSON']
+                }, {
+                    name: 'Région',
+                    value: region['GeoJSON'],
+                }, {
+                    name: 'Départements',
+                    value: region['Départements'],
+                }, {
+                    name: 'Arrondissements',
+                    value: region['Arrondissements'],
+                }, {
+                    name: 'Cantons',
+                    value: region['Cantons'],
+                }, {
+                    name: 'Communes',
+                    value: region['Communes'],
+                }]
+            )
+        }
+        case 'Anciennes régions': {
+            const region = geojsons[name]
+            return (
+                [{
+                    previous: 'Anciennes régions',
+                    value: geojsons['Anciennes régions']
+                }, {
+                    name: name,
+                    value: region['GeoJSON']
+                }, {
+                    name: 'Région',
+                    value: region['GeoJSON'],
+                }, {
+                    name: 'Départements',
+                    value: region['Départements'],
+                }, {
+                    name: 'Arrondissements',
+                    value: region['Arrondissements'],
+                }, {
+                    name: 'Cantons',
+                    value: region['Cantons'],
+                }, {
+                    name: 'Communes',
+                    value: region['Communes'],
+                }]
+            )
+        }
+        case 'Départements': {
+            const department = geojsons[name]
+            const region = departements_regions.find(reg => reg['Départements'].some(dep => dep === name))
+            return (
+                [{
+                    previous: region['Nom'],
+                    value: geojsons[region['Nom']]['GeoJSON']
+                }, {
+                    name: name,
+                    value: department['GeoJSON']
+                }, {
+                    name: 'Département',
+                    value: department['GeoJSON'],
+                }, {
+                    name: 'Arrondissements',
+                    value: department['Arrondissements'],
+                }, {
+                    name: 'Cantons',
+                    value: department['Cantons'],
+                }, {
+                    name: 'Communes',
+                    value: department['Communes'],
+                }]
+            )
+        }
 
         default:
-            return 1
+            break;
     }
 }
 
-export const regions = [
-    'Auvergne-Rhône-Alpes',
-    'Bourgogne-Franche-Comté',
-    'Bretagne',
-    'Centre-Val de Loire',
-    'Corse',
-    'Grand Est',
-    'Hauts-de-France',
-    'Île-de-France',
-    'Normandie',
-    'Nouvelle-Aquitaine',
-    'Occitanie',
-    'Pays de la Loire',
-    'Provence-Alpes-Côte d\'Azur'
-]
+export function getGeoJSONBounds(gj) {
+    var coords, bbox;
+    if (!gj.hasOwnProperty('type')) return;
+    coords = getCoordinatesDump(gj);
+    bbox = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY,];
+    return coords.reduce(function (prev, coord) {
+        return [
+            Math.min(coord[0], prev[0]),
+            Math.min(coord[1], prev[1]),
+            Math.max(coord[0], prev[2]),
+            Math.max(coord[1], prev[3])
+        ];
+    }, bbox);
+}
 
-export const old_regions = [
-    'Alsace',
-    'Aquitaine',
-    'Auvergne',
-    'Basse-Normandie',
-    'Bourgogne',
-    'Bretagne',
-    'Centre',
-    'Champagne-Ardenne',
-    'Corse',
-    'Franche-Comté',
-    'Haute-Normandie',
-    'Île-de-France',
-    'Languedoc-Roussillon',
-    'Limousin',
-    'Lorraine',
-    'Midi-Pyrénées',
-    'Nord-Pas-de-Calais',
-    'Pays de la Loire',
-    'Picardie',
-    'Poitou-Charentes',
-    'Provence-Alpes-Côte d\'Azur',
-    'Rhône-Alpes'
-]
-
-export const departments = [
-    'Ain',
-    'Aisne',
-    'Allier',
-    'Alpes-de-Haute-Provence',
-    'Hautes-Alpes',
-    'Alpes-Maritimes',
-    'Ardèche',
-    'Ardennes',
-    'Ariège',
-    'Aube',
-    'Aude',
-    'Aveyron',
-    'Bouches-du-Rhône',
-    'Calvados',
-    'Cantal',
-    'Charente',
-    'Charente-Maritime',
-    'Cher',
-    'Corrèze',
-    'Corse-du-Sud',
-    'Haute-Corse',
-    'Côte-d\'Or',
-    'Côtes d\'Armor',
-    'Creuse',
-    'Dordogne',
-    'Doubs',
-    'Drôme',
-    'Eure',
-    'Eure-et-Loir',
-    'Finistère',
-    'Gard',
-    'Haute-Garonne',
-    'Gers',
-    'Gironde',
-    'Hérault',
-    'Ille-et-Vilaine',
-    'Indre',
-    'Indre-et-Loire',
-    'Isère',
-    'Jura',
-    'Landes',
-    'Loir-et-Cher',
-    'Loire',
-    'Haute-Loire',
-    'Loire-Atlantique',
-    'Loiret',
-    'Lot',
-    'Lot-et-Garonne',
-    'Lozère',
-    'Maine-et-Loire',
-    'Manche',
-    'Marne',
-    'Haute-Marne',
-    'Mayenne',
-    'Meurthe-et-Moselle',
-    'Meuse',
-    'Morbihan',
-    'Moselle',
-    'Nièvre',
-    'Nord',
-    'Oise',
-    'Orne',
-    'Pas-de-Calais',
-    'Puy-de-Dôme',
-    'Pyrénées-Atlantiques',
-    'Hautes-Pyrénées',
-    'Pyrénées-Orientales',
-    'Bas-Rhin',
-    'Haut-Rhin',
-    'Rhône',
-    'Haute-Saône',
-    'Saône-et-Loire',
-    'Sarthe',
-    'Savoie',
-    'Haute-Savoie',
-    'Paris',
-    'Seine-Maritime',
-    'Seine-et-Marne',
-    'Yvelines',
-    'Deux-Sèvres',
-    'Somme',
-    'Tarn',
-    'Tarn-et-Garonne',
-    'Var',
-    'Vaucluse',
-    'Vendée',
-    'Vienne',
-    'Haute-Vienne',
-    'Vosges',
-    'Yonne',
-    'Territoire de Belfort',
-    'Essonne',
-    'Hauts-de-Seine',
-    'Seine-Saint-Denis',
-    'Val-de-Marne',
-    'Val-d\'Oise',
-    'Guadeloupe',
-    'Martinique',
-    'Guyane',
-    'La Réunion',
-    'Mayotte'
-]
-
-export const departements_regions = [
-    {
-        'Nom': 'Auvergne-Rhône-Alpes',
-        'Départements': [
-            'Ain',
-            'Allier',
-            'Ardèche',
-            'Cantal',
-            'Drôme',
-            'Isère',
-            'Loire',
-            'Haute-Loire',
-            'Puy-de-Dôme',
-            'Rhône',
-            'Savoie',
-            'Haute-Savoie'
-        ]
-    },
-    {
-        'Nom': 'Bourgogne-Franche-Comté',
-        'Départements': [
-            'Côte-d\'Or',
-            'Doubs',
-            'Jura',
-            'Nièvre',
-            'Haute-Saône',
-            'Saône-et-Loire',
-            'Yonne',
-            'Territoire de Belfort'
-        ]
-    },
-    {
-        'Nom': 'Bretagne',
-        'Départements': [
-            'Côtes-d\'Armor',
-            'Finistère',
-            'Ille-et-Vilaine',
-            'Morbihan'
-        ]
-    },
-    {
-        'Nom': 'Centre-Val de Loire',
-        'Départements': [
-            'Cher',
-            'Eure-et-Loir',
-            'Indre',
-            'Indre-et-Loire',
-            'Loir-et-Cher',
-            'Loiret'
-        ]
-    },
-    {
-        'Nom': 'Corse',
-        'Départements': [
-            'Corse-du-Sud',
-            'Haute-Corse'
-        ]
-    },
-    {
-        'Nom': 'Grand Est',
-        'Départements': [
-            'Ardennes',
-            'Aube',
-            'Marne',
-            'Haute-Marne',
-            'Meurthe-et-Moselle',
-            'Meuse',
-            'Moselle',
-            'Bas-Rhin',
-            'Haut-Rhin',
-            'Vosges'
-        ]
-    },
-    {
-        'Nom': 'Hauts-de-France',
-        'Départements': [
-            'Aisne',
-            'Nord',
-            'Oise',
-            'Pas-de-Calais',
-            'Somme'
-        ]
-    },
-    {
-        'Nom': 'Île-de-France',
-        'Départements': [
-            'Paris',
-            'Seine-et-Marne',
-            'Yvelines',
-            'Essonne',
-            'Hauts-de-Seine',
-            'Seine-Saint-Denis',
-            'Val-de-Marne',
-            'Val-d\'Oise'
-        ]
-    },
-    {
-        'Nom': 'Normandie',
-        'Départements': [
-            'Calvados',
-            'Eure',
-            'Manche',
-            'Orne',
-            'Seine-Maritime'
-        ]
-    },
-    {
-        'Nom': 'Nouvelle-Aquitaine',
-        'Départements': [
-            'Charente',
-            'Charente-Maritime',
-            'Corrèze',
-            'Creuse',
-            'Dordogne',
-            'Gironde',
-            'Landes',
-            'Lot-et-Garonne',
-            'Pyrénées-Atlantiques',
-            'Deux-Sèvres',
-            'Vienne',
-            'Haute-Vienne'
-        ]
-    },
-    {
-        'Nom': 'Occitanie',
-        'Départements': [
-            'Ariège',
-            'Aude',
-            'Aveyron',
-            'Gard',
-            'Haute-Garonne',
-            'Gers',
-            'Hérault',
-            'Lot',
-            'Lozère',
-            'Hautes-Pyrénées',
-            'Pyrénées-Orientales',
-            'Tarn',
-            'Tarn-et-Garonne'
-        ]
-    },
-    {
-        'Nom': 'Pays de la Loire',
-        'Départements': [
-            'Loire-Atlantique',
-            'Maine-et-Loire',
-            'Mayenne',
-            'Sarthe',
-            'Vendée'
-        ]
-    },
-    {
-        'Nom': 'Provence-Alpes-Côte d\'Azur',
-        'Départements': [
-            'Alpes-de-Haute-Provence',
-            'Hautes-Alpes',
-            'Alpes-Maritimes',
-            'Bouches-du-Rhône',
-            'Var',
-            'Vaucluse'
-        ]
+export function getCoordinatesDump(gj) {
+    var coords;
+    if (gj.type == 'Point') {
+        coords = [gj.coordinates];
+    } else if (gj.type == 'LineString' || gj.type == 'MultiPoint') {
+        coords = gj.coordinates;
+    } else if (gj.type == 'Polygon' || gj.type == 'MultiLineString') {
+        coords = gj.coordinates.reduce(function (dump, part) {
+            return dump.concat(part);
+        }, []);
+    } else if (gj.type == 'MultiPolygon') {
+        coords = gj.coordinates.reduce(function (dump, poly) {
+            return dump.concat(poly.reduce(function (points, part) {
+                return points.concat(part);
+            }, []));
+        }, []);
+    } else if (gj.type == 'Feature') {
+        coords = getCoordinatesDump(gj.geometry);
+    } else if (gj.type == 'GeometryCollection') {
+        coords = gj.geometries.reduce(function (dump, g) {
+            return dump.concat(getCoordinatesDump(g));
+        }, []);
+    } else if (gj.type == 'FeatureCollection') {
+        coords = gj.features.reduce(function (dump, f) {
+            return dump.concat(getCoordinatesDump(f));
+        }, []);
     }
-]
-
-export const departements_old_regions = [
-    {
-        'Nom': 'Alsace',
-        'Départements': [
-            'Bas-Rhin',
-            'Haut-Rhin',
-        ]
-    },
-    {
-        'Nom': 'Aquitaine',
-        'Départements': [
-            'Dordogne',
-            'Gironde',
-            'Landes',
-            'Lot-et-Garonne',
-            'Pyrénées-Atlantiques',
-        ]
-    },
-    {
-        'Nom': 'Auvergne',
-        'Départements': [
-            'Allier',
-            'Cantal',
-            'Haute-Loire',
-            'Puy-de-Dôme',
-        ]
-    },
-    {
-        'Nom': 'Basse-Normandie',
-        'Départements': [
-            'Calvados',
-            'Manche',
-            'Orne',
-        ]
-    },
-    {
-        'Nom': 'Bourgogne',
-        'Départements': [
-            'Côte-d\'Or',
-            'Nièvre',
-            'Saône-et-Loire',
-            'Yonne',
-        ]
-    },
-    {
-        'Nom': 'Bretagne',
-        'Départements': [
-            'Côtes-d\'Armor',
-            'Finistère',
-            'Ille-et-Vilaine',
-            'Morbihan'
-        ]
-    },
-    {
-        'Nom': 'Centre-Val de Loire',
-        'Départements': [
-            'Cher',
-            'Eure-et-Loir',
-            'Indre',
-            'Indre-et-Loire',
-            'Loir-et-Cher',
-            'Loiret'
-        ]
-    },
-    {
-        'Nom': 'Champagne-Ardenne',
-        'Départements': [
-            'Ardennes',
-            'Aube',
-            'Marne',
-            'Haute-Marne',
-        ]
-    },
-    {
-        'Nom': 'Corse',
-        'Départements': [
-            'Corse-du-Sud',
-            'Haute-Corse'
-        ]
-    },
-    {
-        'Nom': 'Franche-Comté',
-        'Départements': [
-            'Doubs',
-            'Jura',
-            'Haute-Saône',
-            'Territoire de Belfort'
-        ]
-    },
-    {
-        'Nom': 'Haute-Normandie',
-        'Départements': [
-            'Eure',
-            'Seine-Maritime'
-        ]
-    },
-    {
-        'Nom': 'Île-de-France',
-        'Départements': [
-            'Paris',
-            'Seine-et-Marne',
-            'Yvelines',
-            'Essonne',
-            'Hauts-de-Seine',
-            'Seine-Saint-Denis',
-            'Val-de-Marne',
-            'Val-d\'Oise'
-        ]
-    },
-    {
-        'Nom': 'Languedoc-Roussillon',
-        'Départements': [
-            'Aude',
-            'Gard',
-            'Hérault',
-            'Lozère',
-            'Pyrénées-Orientales',
-        ]
-    },
-    {
-        'Nom': 'Limousin',
-        'Départements': [
-            'Corrèze',
-            'Creuse',
-            'Haute-Vienne'
-        ]
-    },
-    {
-        'Nom': 'Lorraine',
-        'Départements': [
-            'Meurthe-et-Moselle',
-            'Meuse',
-            'Moselle',
-            'Vosges'
-        ]
-    },
-    {
-        'Nom': 'Midi-Pyrénées',
-        'Départements': [
-            'Ariège',
-            'Aveyron',
-            'Haute-Garonne',
-            'Gers',
-            'Lot',
-            'Hautes-Pyrénées',
-            'Tarn',
-            'Tarn-et-Garonne'
-        ]
-    },
-    {
-        'Nom': 'Nord-Pas-de-Calais',
-        'Départements': [
-            'Nord',
-            'Pas-de-Calais',
-        ]
-    },
-    {
-        'Nom': 'Pays de la Loire',
-        'Départements': [
-            'Loire-Atlantique',
-            'Maine-et-Loire',
-            'Mayenne',
-            'Sarthe',
-            'Vendée'
-        ]
-    },
-    {
-        'Nom': 'Picardie',
-        'Départements': [
-            'Aisne',
-            'Oise',
-            'Somme'
-        ]
-    },
-    {
-        'Nom': 'Poitou-Charentes',
-        'Départements': [
-            'Charente',
-            'Charente-Maritime',
-            'Deux-Sèvres',
-            'Vienne',
-        ]
-    },
-    {
-        'Nom': 'Provence-Alpes-Côte d\'Azur',
-        'Départements': [
-            'Alpes-de-Haute-Provence',
-            'Hautes-Alpes',
-            'Alpes-Maritimes',
-            'Bouches-du-Rhône',
-            'Var',
-            'Vaucluse'
-        ]
-    },
-    {
-        'Nom': 'Rhône-Alpes',
-        'Départements': [
-            'Ain',
-            'Ardèche',
-            'Drôme',
-            'Isère',
-            'Loire',
-            'Rhône',
-            'Savoie',
-            'Haute-Savoie'
-        ]
-    }
-]
+    return coords;
+}

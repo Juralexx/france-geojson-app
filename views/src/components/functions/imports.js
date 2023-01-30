@@ -1178,7 +1178,7 @@ export const geojsons = {
         'Cantons': cantons_landes,
         'Communes': communes_landes,
     },
-    'Loire-et-Cher': {
+    'Loir-et-Cher': {
         'GeoJSON': loir_et_cher,
         'Arrondissements': arrondissements_loir_et_cher,
         'Cantons': cantons_loir_et_cher,

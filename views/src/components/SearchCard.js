@@ -11,7 +11,7 @@ import { getLevel, getZoom } from './functions/functions'
 const SearchCard = () => {
     const { selected, setSelected, arborescence } = React.useContext(SelectionContext)
     const { search, setSearch } = React.useContext(SearchContext)
-    const { setGeoJSON, setLeaflet, leaflet } = React.useContext(GeoJSONContext)
+    const { setGeoJSON, setLeaflet } = React.useContext(GeoJSONContext)
     const { isLoading, setLoading } = React.useContext(LoadingContext)
     const inputRef = React.useRef()
 
@@ -37,7 +37,7 @@ const SearchCard = () => {
                     <Icon name="Search" className="search-svg" onClick={() => inputRef.current.focus()} />
                 )}
             </SearchInput>
-            {selected.level === 1 ? (
+            {selected.level === 0 ? (
                 <SelectionList>
                     <h1>France</h1>
                     {tabs.map((tab, i) => {
@@ -46,7 +46,7 @@ const SearchCard = () => {
                                 key={i}
                                 onClick={() => {
                                     setGeoJSON(geojsons[tab])
-                                    setSelected(prev => ({ ...prev, level: 1, name: tab }))
+                                    setSelected(prev => ({ ...prev, level: 0, name: tab }))
                                     setLoading(true)
                                     setLeaflet({ zoomAction: 'zoomOut', zoom: 6 })
                                 }}
@@ -69,7 +69,7 @@ const SearchCard = () => {
                                 <div className='previous' onClick={() => {
                                     setGeoJSON(arborescence[0].value)
                                     setLeaflet({ zoomAction: 'zoomOut', zoom: getZoom(arborescence[0].previous) })
-                                    setSelected(prev => ({ ...prev, level: getLevel(key), name: arborescence[0].previous }))
+                                    setSelected(prev => ({ ...prev, level: getLevel(arborescence[0].previous), name: arborescence[0].previous }))
                                 }}>
                                     <Icon name="DoubleArrowLeft" />
                                     {arborescence[0].previous}
@@ -81,7 +81,7 @@ const SearchCard = () => {
                                             key={i}
                                             onClick={() => {
                                                 setGeoJSON(tab.value)
-                                                setSelected(prev => ({ ...prev, level: key, name: tab.name }))
+                                                setSelected(prev => ({ ...prev, level: getLevel(tab.name), name: tab.name }))
                                                 setLoading(true)
                                             }}
                                         >
@@ -106,10 +106,12 @@ const SearchCard = () => {
 export default SearchCard
 
 const SearchContainer = styled.div`
-    position         : absolute;
-    top              : 20px;
-    left             : 20px;
-    min-width        : 350px;
+    position  : absolute;
+    top       : 20px;
+    left      : 20px;
+    width     : 30%;
+    min-width : 300px;
+    max-width : 350px;
 `
 
 const SearchInput = styled.div`
@@ -153,23 +155,29 @@ const SelectionList = styled.div`
         font-size   : 22px;
         font-weight : 700;
         margin      : 0;
-        padding     : 15px 30px;
+        padding     : 5px 30px;
         color       : var(--title);
     }
 
     .previous {
         display        : flex;
         align-items    : center;
-        padding        : 0 28px;
+        padding        : 10px 28px 0;
         text-transform : uppercase;
         line-height    : 16px;
         color          : var(--secondary);
+        transition     : .2s;
         cursor         : pointer;
         svg {
             margin-right : 7px;
+            transition   : .2s;
         }
         &:hover {
-            color : var(--primary);
+            padding    : 10px 28px 0 24px;
+            transition : .2s;
+            svg {
+                margin-right : 16px;
+            }
         }
     }
 

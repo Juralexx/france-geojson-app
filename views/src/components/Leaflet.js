@@ -2,82 +2,28 @@ import React from 'react'
 import styled from 'styled-components';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
-import { GeoJSONContext, LoadingContext, SelectionContext } from '../AppContext';
-import { departements_regions, departments, getZoom, old_regions, regions } from './functions/functions'
+import { GeoJSONContext, SelectionContext } from '../AppContext';
+import { getArborescence, getGeoJSONBounds, getCoordinatesDump, getZoom } from './functions/functions'
+import { departments, old_regions, regions } from './functions/api'
 import { geojsons } from './functions/imports';
 
 const Leaflet = () => {
-    const defaultCenter = [46.873467013745916, 2.5836305570248217]
-
+    const defaultCenter = [47.29580115135585, -0.034327425932688935]
     const { selected, setSelected, arborescence, setArborescence } = React.useContext(SelectionContext)
     const { geoJSON, setGeoJSON, leaflet, setLeaflet } = React.useContext(GeoJSONContext)
-    const { setLoading } = React.useContext(LoadingContext)
 
-    const findGeoJSON = (property) => {
-        if (regions.includes(property)) {
-            const region = geojsons[property]
-            setGeoJSON(region['GeoJSON'])
-            setArborescence([{
-                previous: 'Régions',
-                value: geojsons['Régions']
-            }, {
-                name: property,
-                value: region['GeoJSON']
-            }, {
-                name: 'Départements',
-                value: region['Départements'],
-            }, {
-                name: 'Arrondissements',
-                value: region['Arrondissements'],
-            }, {
-                name: 'Cantons',
-                value: region['Cantons'],
-            }, {
-                name: 'Communes',
-                value: region['Communes'],
-            }])
-        } else if (old_regions.includes(property)) {
-            const region = geojsons[property]
-            setGeoJSON(region['GeoJSON'])
-            setArborescence([{
-                previous: 'Anciennes régions',
-                value: geojsons['Anciennes régions']
-            }, {
-                name: property,
-                value: region['GeoJSON']
-            }, {
-                name: 'Départements',
-                value: region['Départements'],
-            }, {
-                name: 'Arrondissements',
-                value: region['Arrondissements'],
-            }, {
-                name: 'Cantons',
-                value: region['Cantons'],
-            }, {
-                name: 'Communes',
-                value: region['Communes'],
-            }])
-        } else if (departments.includes(property)) {
-            const department = geojsons[property]
-            const region = departements_regions.find(reg => reg['Départements'].some(dep => dep === property))
-            setGeoJSON(department['GeoJSON'])
-            setArborescence([{
-                previous: region['Nom'],
-                value: geojsons[region['Nom']]['GeoJSON']
-            }, {
-                name: property,
-                value: department['GeoJSON']
-            }, {
-                name: 'Arrondissements',
-                value: department['Arrondissements'],
-            }, {
-                name: 'Cantons',
-                value: department['Cantons'],
-            }, {
-                name: 'Communes',
-                value: department['Communes'],
-            }])
+    const fetchGeoJSON = (propertyName) => {
+        if (regions.includes(propertyName)) {
+            setGeoJSON(geojsons[propertyName]['GeoJSON'])
+            setArborescence(getArborescence('Régions', propertyName))
+        }
+        else if (old_regions.includes(propertyName)) {
+            setGeoJSON(geojsons[propertyName]['GeoJSON'])
+            setArborescence(getArborescence('Anciennes régions', propertyName))
+        }
+        else if (departments.includes(propertyName)) {
+            setGeoJSON(geojsons[propertyName]['GeoJSON'])
+            setArborescence(getArborescence('Départements', propertyName))
         }
     }
 
@@ -89,15 +35,18 @@ const Leaflet = () => {
         const map = useMap()
 
         const zoomToFeature = (event, layer) => {
-            const { lat, lng } = event.target.getCenter()
+            // const { lat, lng } = event.target.getCenter()
             const nom = layer.feature.properties.nom
 
+            console.log(event.target.getBounds())
+            console.log(getGeoJSONBounds(geoJSON))
+
             if (regions.includes(nom) || old_regions.includes(nom)) {
-                setSelected(prev => ({ ...prev, level: 2, name: 'Régions' }))
-                map.flyTo([lat, (lng - 0.5)], 8)
+                setSelected(prev => ({ ...prev, level: 1, name: 'Région' }))
+                map.fitBounds(event.target.getBounds());
             } else if (departments.includes(nom)) {
-                setSelected(prev => ({ ...prev, level: 3, name: 'Départements' }))
-                map.flyTo([lat, (lng - 0.5)], 10)
+                setSelected(prev => ({ ...prev, level: 2, name: 'Département' }))
+                map.fitBounds(event.target.getBounds());
             } else {
                 map.flyTo(defaultCenter, 6)
             }
@@ -105,19 +54,43 @@ const Leaflet = () => {
 
         React.useEffect(() => {
             if (leaflet.zoomAction === 'zoomOut') {
+                // const geojsonBounds = getGeoJSONBounds(geoJSON)
+                // map.fitBounds(geojsonBounds);
                 map.flyTo(map.getCenter(), leaflet.zoom)
+
+                if (arborescence.length > 0) {
+                    let previous = arborescence[0].previous
+
+                    if (regions.includes(previous)) {
+                        setArborescence(getArborescence('Régions', previous))
+                        setSelected({ level: 1, name: 'Région' })
+                    }
+                    else if (old_regions.includes(previous)) {
+                        setGeoJSON(geojsons[previous]['GeoJSON'])
+                        setArborescence(getArborescence('Anciennes régions', previous))
+                        setSelected({ level: 1, name: 'Région' })
+                    }
+                    else {
+                        setSelected({ level: 0, name: 'Régions' })
+                        setArborescence([])
+                    }
+                }
+                setLeaflet(prev => ({ ...prev, zoomAction: '' }))
             }
-        }, [leaflet])
+        }, [])
 
         return (
             <GeoJSON
                 data={geoJSON}
                 onEachFeature={(__, layer) => {
                     layer.on({
-                        click: (event) => {
-                            setLeaflet({ zoomAction: 'zoomIn', zoom: getZoom(selected.level) })
-                            zoomToFeature(event, layer)
-                            findGeoJSON(layer.feature.properties.nom)
+                        click: event => {
+                            let nom = layer.feature.properties.nom
+                            if (regions.includes(nom) || old_regions.includes(nom) || departments.includes(nom)) {
+                                setLeaflet({ zoomAction: 'zoomIn', zoom: getZoom(selected.level) })
+                                zoomToFeature(event, layer)
+                                fetchGeoJSON(nom)
+                            }
                         }
                     });
                 }}
@@ -133,10 +106,9 @@ const Leaflet = () => {
         <LeafletContainer>
             <MapContainer
                 key={null}
-                center={[46.873467013745916, 2.5836305570248217]}
+                center={defaultCenter}
                 zoom={leaflet.zoom}
                 minZoom={6}
-                whenCreated={map => setLoading(false)}
                 style={{ width: '100vw', height: '100vh' }}
             >
                 <TileLayer
