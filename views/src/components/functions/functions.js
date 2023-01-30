@@ -163,27 +163,27 @@ export function getGeoJSONBounds(gj) {
 
 export function getCoordinatesDump(gj) {
     var coords;
-    if (gj.type == 'Point') {
+    if (gj.type === 'Point') {
         coords = [gj.coordinates];
-    } else if (gj.type == 'LineString' || gj.type == 'MultiPoint') {
+    } else if (gj.type === 'LineString' || gj.type === 'MultiPoint') {
         coords = gj.coordinates;
-    } else if (gj.type == 'Polygon' || gj.type == 'MultiLineString') {
+    } else if (gj.type === 'Polygon' || gj.type === 'MultiLineString') {
         coords = gj.coordinates.reduce(function (dump, part) {
             return dump.concat(part);
         }, []);
-    } else if (gj.type == 'MultiPolygon') {
+    } else if (gj.type === 'MultiPolygon') {
         coords = gj.coordinates.reduce(function (dump, poly) {
             return dump.concat(poly.reduce(function (points, part) {
                 return points.concat(part);
             }, []));
         }, []);
-    } else if (gj.type == 'Feature') {
+    } else if (gj.type === 'Feature') {
         coords = getCoordinatesDump(gj.geometry);
-    } else if (gj.type == 'GeometryCollection') {
+    } else if (gj.type === 'GeometryCollection') {
         coords = gj.geometries.reduce(function (dump, g) {
             return dump.concat(getCoordinatesDump(g));
         }, []);
-    } else if (gj.type == 'FeatureCollection') {
+    } else if (gj.type === 'FeatureCollection') {
         coords = gj.features.reduce(function (dump, f) {
             return dump.concat(getCoordinatesDump(f));
         }, []);

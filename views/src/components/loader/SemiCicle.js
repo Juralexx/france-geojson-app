@@ -23,9 +23,9 @@ const Loader = styled.div`
     z-index         : 1000;
 
     .circular {
-        animation        : rotate 2s linear infinite;
-        width            : 50px;
-        height           : 50px;
+        animation : rotate 2s linear infinite;
+        width     : 40px;
+        height    : 40px;
     }
 
     .path {

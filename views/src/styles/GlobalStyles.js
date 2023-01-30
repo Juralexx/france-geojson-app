@@ -64,7 +64,7 @@ const GlobalStyles = createGlobalStyle`
     }
 
     ::-webkit-scrollbar {
-        width : 12px;
+        width : 8px;
     }
     ::-webkit-scrollbar-track {
         background : var(--body);

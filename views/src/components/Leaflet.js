@@ -3,9 +3,10 @@ import styled from 'styled-components';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import { GeoJSONContext, SelectionContext } from '../AppContext';
-import { getArborescence, getGeoJSONBounds, getCoordinatesDump, getZoom } from './functions/functions'
+import { getArborescence, getGeoJSONBounds, getZoom } from './functions/functions'
 import { departments, old_regions, regions } from './functions/api'
 import { geojsons } from './functions/imports';
+import { doesStringIncludes } from './Utils'
 
 const Leaflet = () => {
     const defaultCenter = [47.29580115135585, -0.034327425932688935]
@@ -35,18 +36,14 @@ const Leaflet = () => {
         const map = useMap()
 
         const zoomToFeature = (event, layer) => {
-            // const { lat, lng } = event.target.getCenter()
             const nom = layer.feature.properties.nom
-
-            console.log(event.target.getBounds())
-            console.log(getGeoJSONBounds(geoJSON))
 
             if (regions.includes(nom) || old_regions.includes(nom)) {
                 setSelected(prev => ({ ...prev, level: 1, name: 'Région' }))
-                map.fitBounds(event.target.getBounds());
+                map.flyToBounds(event.target.getBounds());
             } else if (departments.includes(nom)) {
                 setSelected(prev => ({ ...prev, level: 2, name: 'Département' }))
-                map.fitBounds(event.target.getBounds());
+                map.flyToBounds(event.target.getBounds());
             } else {
                 map.flyTo(defaultCenter, 6)
             }
@@ -54,12 +51,18 @@ const Leaflet = () => {
 
         React.useEffect(() => {
             if (leaflet.zoomAction === 'zoomOut') {
-                // const geojsonBounds = getGeoJSONBounds(geoJSON)
-                // map.fitBounds(geojsonBounds);
-                map.flyTo(map.getCenter(), leaflet.zoom)
-
                 if (arborescence.length > 0) {
                     let previous = arborescence[0].previous
+
+                    if (!doesStringIncludes(previous, ['France', 'Régions', 'Anciennes régions', 'Départements'])) {
+                        const geojsonBounds = getGeoJSONBounds(geoJSON)
+                        map.flyToBounds([
+                            [geojsonBounds[3], geojsonBounds[2]],
+                            [geojsonBounds[1], geojsonBounds[0]]
+                        ])
+                    } else {
+                        map.flyTo(defaultCenter, 6)
+                    }
 
                     if (regions.includes(previous)) {
                         setArborescence(getArborescence('Régions', previous))
@@ -108,7 +111,7 @@ const Leaflet = () => {
                 key={null}
                 center={defaultCenter}
                 zoom={leaflet.zoom}
-                minZoom={6}
+                // minZoom={6}
                 style={{ width: '100vw', height: '100vh' }}
             >
                 <TileLayer
