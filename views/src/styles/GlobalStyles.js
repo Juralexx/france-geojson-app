@@ -92,7 +92,7 @@ const GlobalStyles = createGlobalStyle`
     h5 {
         margin      : 0 0 10px 0;
         font-weight : 600;
-        color       : var(--text-tertiary);
+        color       : var(--title);
     }
 
     h1 {

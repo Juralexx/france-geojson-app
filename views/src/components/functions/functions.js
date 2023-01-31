@@ -29,15 +29,9 @@ export const getZoom = (selectedType) => {
 export const getLevel = (selectedLevel) => {
     if (selectedLevel === 'France')
         return 0
-    else if (selectedLevel === 'Régions')
+    else if (selectedLevel === 'Régions' || selectedLevel === 'Région' || selectedLevel === 'Anciennes régions')
         return 1
-    else if (selectedLevel === 'Région')
-        return 1
-    else if (selectedLevel === 'Anciennes régions')
-        return 1
-    else if (selectedLevel === 'Départements')
-        return 2
-    else if (selectedLevel === 'Département')
+    else if (selectedLevel === 'Départements' || selectedLevel === 'Département')
         return 2
     else if (selectedLevel === 'Arrondissements')
         return 3
@@ -45,9 +39,7 @@ export const getLevel = (selectedLevel) => {
         return 4
     else if (selectedLevel === 'Communes')
         return 5
-    else if (regions.includes(selectedLevel))
-        return 1
-    else if (old_regions.includes(selectedLevel))
+    else if (regions.includes(selectedLevel) || old_regions.includes(selectedLevel))
         return 1
     else if (departments.includes(selectedLevel))
         return 2
@@ -61,39 +53,12 @@ export const getLevel = (selectedLevel) => {
 
 export const getArborescence = (type, name) => {
     switch (type) {
-        case 'Régions': {
+        case ('Régions' || 'Anciennes régions'): {
             const region = geojsons[name]
             return (
                 [{
-                    previous: 'Régions',
-                    value: geojsons['Régions']
-                }, {
-                    name: name,
-                    value: region['GeoJSON']
-                }, {
-                    name: 'Région',
-                    value: region['GeoJSON'],
-                }, {
-                    name: 'Départements',
-                    value: region['Départements'],
-                }, {
-                    name: 'Arrondissements',
-                    value: region['Arrondissements'],
-                }, {
-                    name: 'Cantons',
-                    value: region['Cantons'],
-                }, {
-                    name: 'Communes',
-                    value: region['Communes'],
-                }]
-            )
-        }
-        case 'Anciennes régions': {
-            const region = geojsons[name]
-            return (
-                [{
-                    previous: 'Anciennes régions',
-                    value: geojsons['Anciennes régions']
+                    previous: type,
+                    value: geojsons[type]
                 }, {
                     name: name,
                     value: region['GeoJSON']

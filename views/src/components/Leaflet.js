@@ -4,13 +4,13 @@ import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import { GeoJSONContext, SelectionContext } from '../AppContext';
 import { getArborescence, getGeoJSONBounds, getZoom } from './functions/functions'
-import { departments, old_regions, regions } from './functions/api'
+import { departements_old_regions, departements_regions, departments, old_regions, regions } from './functions/api'
 import { geojsons } from './functions/imports';
 import { doesStringIncludes } from './Utils'
 
 const Leaflet = () => {
     const defaultCenter = [47.29580115135585, -0.034327425932688935]
-    const { selected, setSelected, arborescence, setArborescence } = React.useContext(SelectionContext)
+    const { selected, setSelected, arborescence, setArborescence, hovered, setHovered } = React.useContext(SelectionContext)
     const { geoJSON, setGeoJSON, leaflet, setLeaflet } = React.useContext(GeoJSONContext)
 
     const fetchGeoJSON = (propertyName) => {
@@ -40,10 +40,10 @@ const Leaflet = () => {
 
             if (regions.includes(nom) || old_regions.includes(nom)) {
                 setSelected(prev => ({ ...prev, level: 1, name: 'Région' }))
-                map.flyToBounds(event.target.getBounds());
+                map.flyToBounds(event.target.getBounds(), { paddingTopLeft: [200, 0] });
             } else if (departments.includes(nom)) {
                 setSelected(prev => ({ ...prev, level: 2, name: 'Département' }))
-                map.flyToBounds(event.target.getBounds());
+                map.flyToBounds(event.target.getBounds(), { paddingTopLeft: [200, 0] });
             } else {
                 map.flyTo(defaultCenter, 6)
             }
@@ -82,6 +82,7 @@ const Leaflet = () => {
             }
         }, [])
 
+ 
         return (
             <GeoJSON
                 data={geoJSON}
@@ -93,6 +94,71 @@ const Leaflet = () => {
                                 setLeaflet({ zoomAction: 'zoomIn', zoom: getZoom(selected.level) })
                                 zoomToFeature(event, layer)
                                 fetchGeoJSON(nom)
+                            }
+                        },
+                        mouseout: () => {
+                            setHovered({ active: false, element: { type: '', region: '', departement: '', arrondissement: '', canton: '', commune: '', name: '' } })
+                        },
+                        mouseover: () => {
+                            if (hovered.element.name !== layer.feature.properties.nom) {
+                                switch (selected.name) {
+                                    case ('Régions' || 'Anciennes régions'):
+                                        return setHovered({
+                                            active: true,
+                                            element: {
+                                                ...hovered.element,
+                                                type: 'Région',
+                                                region: layer.feature.properties.nom,
+                                                departement: '',
+                                                name: layer.feature.properties.nom
+                                            }
+                                        })
+                                    case 'Départements':
+                                        return setHovered({
+                                            active: true,
+                                            element: {
+                                                type: 'Département',
+                                                region: departements_regions.find(reg => reg['Départements'].includes(layer.feature.properties.nom))['Nom'],
+                                                departement: layer.feature.properties.nom,
+                                                name: layer.feature.properties.nom
+                                            }
+                                        })
+                                    case 'Arrondissements':
+                                        return setHovered({
+                                            active: true,
+                                            element: {
+                                                type: 'Arrondissement',
+                                                region: arborescence[0].previous,
+                                                departement: arborescence[1].name,
+                                                arrondissement: layer.feature.properties.nom,
+                                                name: layer.feature.properties.nom
+                                            }
+                                        })
+                                    case 'Cantons':
+                                        return setHovered({
+                                            active: true,
+                                            element: {
+                                                type: 'Canton',
+                                                region: arborescence[0].previous,
+                                                departement: arborescence[1].name,
+                                                canton: layer.feature.properties.nom,
+                                                name: layer.feature.properties.nom
+                                            }
+                                        })
+                                    case 'Communes':
+                                        return setHovered({
+                                            active: true,
+                                            element: {
+                                                type: 'Commune',
+                                                region: arborescence[0].previous,
+                                                departement: arborescence[1].name,
+                                                commune: layer.feature.properties.nom,
+                                                name: layer.feature.properties.nom
+                                            }
+                                        })
+                                    default:
+                                        break;
+                                }
                             }
                         }
                     });
@@ -111,7 +177,11 @@ const Leaflet = () => {
                 key={null}
                 center={defaultCenter}
                 zoom={leaflet.zoom}
-                // minZoom={6}
+                minZoom={6}
+                boundsOptions={{
+                    paddingTopLeft: [500, 0],
+                    paddingBottomRight: [500, 0],
+                }}
                 style={{ width: '100vw', height: '100vh' }}
             >
                 <TileLayer

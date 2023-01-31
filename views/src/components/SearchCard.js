@@ -1,22 +1,15 @@
 import React from 'react'
 import axios from 'axios'
 import styled from 'styled-components'
-import { GeoJSONContext, LoadingContext, SearchContext, SelectionContext } from '../AppContext'
+import { SearchContext } from '../AppContext'
 import Icon from './tools/icons/Icon'
 import { ClassicInput } from './tools/Input'
 import SemiCicle from './loader/SemiCicle'
-import { addClass } from './Utils'
-import { geojsons } from './functions/imports'
-import { getLevel, getZoom } from './functions/functions'
+import { doesAtLeastOneArrayInElementContainValues } from './Utils'
 
 const SearchCard = () => {
-    const { selected, setSelected, arborescence } = React.useContext(SelectionContext)
     const { search, setSearch } = React.useContext(SearchContext)
-    const { setGeoJSON, setLeaflet } = React.useContext(GeoJSONContext)
-    const { isLoading, setLoading } = React.useContext(LoadingContext)
     const inputRef = React.useRef()
-
-    const tabs = ['France', 'Régions', 'Anciennes régions', 'Départements']
 
     const searchLocation = async () => {
         if (!search.query || search.query.trim() === "") return
@@ -26,7 +19,8 @@ const SearchCard = () => {
             const paths = [
                 `${process.env.REACT_APP_API_LOCATIONS_URL}api/locations/find/${search.query}`,
                 `${process.env.REACT_APP_API_LOCATIONS_URL}api/departments/find/${search.query}`,
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/regions/find/${search.query}`
+                `${process.env.REACT_APP_API_LOCATIONS_URL}api/regions/find/${search.query}`,
+                `${process.env.REACT_APP_API_LOCATIONS_URL}api/regions/new/find/${search.query}`
             ]
 
             const response = paths.map(async (path, i) => {
@@ -34,26 +28,30 @@ const SearchCard = () => {
                     .get(encodeURI(path))
                     .then(res => {
                         if (i === 0)
-                            return res.data.map(el => Object.assign(el, { type: 'location' }))
+                            return res.data.map(el => Object.assign(el, { type: 'commune' }))
                         else if (i === 1)
-                            return res.data.map(el => Object.assign(el, { type: 'department' }))
+                            return res.data.map(el => Object.assign(el, { type: 'département' }))
                         else if (i === 2)
-                            return res.data.map(el => Object.assign(el, { type: 'region' }))
+                            return res.data.map(el => Object.assign(el, { type: 'région' }))
+                        else if (i === 3)
+                            return res.data.map(el => Object.assign(el, { type: 'région' }))
                     })
                     .catch(err => console.error(err))
             })
             Promise.all(response).then(res => {
-                if (res.length > 0)
+                if (doesAtLeastOneArrayInElementContainValues(res)) {
                     setSearch(data => ({ ...data, results: Array.prototype.concat(...res) }))
-                else setSearch(data => ({ ...data, results: [], isLoading: false }))
+                } else {
+                    setSearch(data => ({ ...data, results: [], isLoading: false }))
+                }
             })
         } else {
-            setSearch(data => ({ ...data, state: false, isLoading: false }))
+            setSearch(data => ({ ...data, state: false, results: [], isLoading: false }))
         }
     }
 
     return (
-        <SearchContainer>
+        <>
             <SearchInput>
                 <Icon name="Menu" className="menu-svg" />
                 <ClassicInput
@@ -78,7 +76,8 @@ const SearchCard = () => {
                     />
                 )}
             </SearchInput>
-            {search.state ? (
+
+            {search.state &&
                 <AutoCompleteContainer
                     tabIndex="0"
                     style={{ display: !search.state ? "none" : "block" }}
@@ -87,19 +86,19 @@ const SearchCard = () => {
                         search.results.map((element, key) => {
                             return (
                                 <div key={key}>
-                                    {element.type === 'location' &&
+                                    {element.type === 'commune' &&
                                         <div className="auto-complete-item" onClick={() => { }}>
-                                            {`${element.fields.com_nom} - ${element.fields.dep_nom} (${element.fields.dep_code})`}
+                                            <span>{`${element.fields.com_nom}`}</span> - <em>{`${element.fields.dep_nom} (${element.fields.dep_code})`}</em> <span>- {element.type}</span>
                                         </div>
                                     }
-                                    {element.type === 'department' &&
+                                    {element.type === 'département' &&
                                         <div className="auto-complete-item" onClick={() => { }}>
-                                            {`${element.nom_departement} - ${element.code_departement}`}
+                                            <span>{`${element.nom_departement} - ${element.code_departement}`}</span> <span>- {element.type}</span>
                                         </div>
                                     }
-                                    {element.type === 'region' &&
+                                    {element.type === 'région' &&
                                         <div className="auto-complete-item" onClick={() => { }}>
-                                            {`${element.nom_region}`}
+                                            <span>{`${element.nom_region}`}</span> <span>- {element.type}</span>
                                         </div>
                                     }
                                 </div>
@@ -119,84 +118,12 @@ const SearchCard = () => {
                         </div>
                     }
                 </AutoCompleteContainer>
-            ) : (
-                selected.level === 0 ? (
-                    <SelectionList>
-                        <h1>France</h1>
-                        {tabs.map((tab, i) => {
-                            return (
-                                <div className={`list-choice ${addClass(selected.name === tab, 'active')}`}
-                                    key={i}
-                                    onClick={() => {
-                                        setGeoJSON(geojsons[tab])
-                                        setSelected(prev => ({ ...prev, level: 0, name: tab }))
-                                        setLoading(true)
-                                        setLeaflet({ zoomAction: 'zoomOut', zoom: 6 })
-                                    }}
-                                >
-                                    {selected.name === tab ? (
-                                        isLoading ? <SemiCicle /> : <Icon name="Spinner" className="icon" />
-                                    ) : (
-                                        <Icon name="Point" className="icon" />
-                                    )}
-                                    {tab}
-                                </div>
-                            )
-                        })}
-                    </SelectionList>
-                ) : (
-                    [...new Array(6)].map((_, key) => {
-                        return (
-                            selected.level === key && (
-                                <SelectionList key={key}>
-                                    <div className='previous' onClick={() => {
-                                        setGeoJSON(arborescence[0].value)
-                                        setLeaflet({ zoomAction: 'zoomOut', zoom: getZoom(arborescence[0].previous) })
-                                        setSelected(prev => ({ ...prev, level: getLevel(arborescence[0].previous), name: arborescence[0].previous }))
-                                    }}>
-                                        <Icon name="DoubleArrowLeft" />
-                                        {arborescence[0].previous}
-                                    </div>
-                                    <h2>{arborescence[1].name}</h2>
-                                    {arborescence.slice(2).map((tab, i) => {
-                                        return (
-                                            <div className={`list-choice ${addClass(selected.name === tab.name, 'active')}`}
-                                                key={i}
-                                                onClick={() => {
-                                                    setGeoJSON(tab.value)
-                                                    setSelected(prev => ({ ...prev, level: getLevel(tab.name), name: tab.name }))
-                                                    setLoading(true)
-                                                }}
-                                            >
-                                                {selected.name === tab.name ? (
-                                                    isLoading ? <SemiCicle /> : <Icon name="Spinner" className="icon" />
-                                                ) : (
-                                                    <Icon name="Point" className="icon" />
-                                                )}
-                                                {tab.name}
-                                            </div>
-                                        )
-                                    })}
-                                </SelectionList>
-                            )
-                        )
-                    })
-                )
-            )}
-        </SearchContainer>
+            }
+        </>
     )
 }
 
 export default SearchCard
-
-const SearchContainer = styled.div`
-    position  : absolute;
-    top       : 20px;
-    left      : 20px;
-    width     : 30%;
-    min-width : 300px;
-    max-width : 350px;
-`
 
 const SearchInput = styled.div`
     display          : flex;
@@ -219,105 +146,7 @@ const SearchInput = styled.div`
     }
 `
 
-const SelectionList = styled.div`
-    margin-top       : 10px;
-    background-color : var(--content);
-    border-radius    : var(--rounded-sm);
-    box-shadow       : var(--shadow-smooth), var(--shadow-relief);
-    padding          : 10px 0;
-    max-width        : 350px;
-
-    h1 {
-        font-size   : 28px;
-        font-weight : 700;
-        margin      : 0;
-        padding     : 15px 30px;
-        color       : var(--title);
-    }
-
-    h2 {
-        font-size   : 22px;
-        font-weight : 700;
-        margin      : 0;
-        padding     : 5px 30px;
-        color       : var(--title);
-    }
-
-    .previous {
-        display        : flex;
-        align-items    : center;
-        padding        : 10px 28px 0;
-        text-transform : uppercase;
-        line-height    : 16px;
-        color          : var(--secondary);
-        transition     : .2s;
-        cursor         : pointer;
-        svg {
-            margin-right : 7px;
-            transition   : .2s;
-        }
-        &:hover {
-            padding    : 10px 28px 0 24px;
-            transition : .2s;
-            svg {
-                margin-right : 16px;
-            }
-        }
-    }
-
-    .list-choice {
-        position    : relative;
-        padding     : 20px 40px 20px 75px;
-        font-size   : 16px;
-        color       : var(--text-tertiary);
-        border-left : 4px solid transparent;
-        cursor      : pointer;
-
-        .icon {
-            position  : absolute;
-            left      : 40px;
-            top       : 50%;
-            transform : translateY(-50%);
-            color     : rgb(207, 216, 220);
-            width     : 14px;
-            height    : 14px;
-        }
-
-        &.active {
-            color            : var(--primary);
-            background-color : var(--content-light);
-            border-color     : var(--primary);
-            svg {
-                color : var(--primary);
-            }
-        }
-
-        .circle-loader {
-            position  : absolute;
-            left      : 40px;
-            top       : 50%;
-            transform : translateY(-50%);
-            width     : 20px;
-            height    : 20px;
-            svg {
-                width  : 20px;
-                height : 20px;
-                circle {
-                    stroke-width : 4px;
-                }
-            }
-        }
-
-        &:hover {
-            color            : var(--primary);
-            background-color : var(--content-light);
-            border-color     : var(--primary);
-        }
-    }
-`
-
 const AutoCompleteContainer = styled.div`
-    position         : absolute;
     margin-top       : 5px;
     max-height       : 300px;
     width            : 100%;
@@ -329,15 +158,31 @@ const AutoCompleteContainer = styled.div`
     z-index          : 750;
 
     .auto-complete-item {
-        position    : relative;
-        display     : flex;
-        align-items : center;
-        padding     : 8px 16px;
-        cursor      : pointer;
+        position  : relative;
+        padding   : 8px 16px;
+        cursor    : pointer;
+        font-size : 13px;
     
         &:hover {
-            color      : var(--primary);
             background : var(--content-light);
+            span {
+                &:first-child {
+                    color : var(--primary);
+                }
+            }
+        }
+
+        span {
+            &:first-child {
+                font-size    : 14px;
+                font-weight  : 500;
+                margin-right : 2px;
+            }
+            &:last-child {
+                font-size   : 12px;
+                color       : var(--text-secondary);
+                margin-left : 2px;
+            }
         }
     }
 
