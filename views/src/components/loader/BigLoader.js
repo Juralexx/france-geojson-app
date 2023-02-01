@@ -2,18 +2,52 @@ import React from 'react'
 import styled from 'styled-components'
 import Icon from '../tools/icons/Icon'
 
-const BigLoader = (props) => {
+const BigLoader = ({ requestProgress }) => {
+    const [percentage, setPercentage] = React.useState(0)
+
+    React.useEffect(() => {
+        if (percentage < 100)
+            if (requestProgress < 1) {
+                const timer = setTimeout(() => {
+                    setPercentage(prev => prev + 1)
+                }, 100)
+                return () => clearTimeout(timer)
+            } else setPercentage(prev => prev + Math.fround(requestProgress * 100))
+        else setPercentage(100)
+    }, [requestProgress, percentage])
+
     return (
-        <Loader {...props} className='circle-loader'>
-            <svg className="circular" viewBox="25 25 50 50">
-                <circle className="path" cx="50" cy="50" r="20" fill="none" strokeWidth="2" strokeMiterlimit="10" />
-            </svg>
-            <Icon name="France" className="icon" />
-        </Loader>
+        <MainLoader>
+            <Loader className='circle-loader'>
+                <svg className="circular" viewBox="25 25 50 50">
+                    <circle className="path" cx="50" cy="50" r="20" fill="none" strokeWidth="2" strokeMiterlimit="10" />
+                </svg>
+                <Icon name="France" className="icon" />
+            </Loader>
+            <ProgressBar>
+                <div className="progress-value" style={{ width: `${percentage}%` }}></div>
+                <div className="percentage">
+                    <div>Chargement...</div>
+                    <div>{percentage || 0}%</div>
+                </div>
+            </ProgressBar>
+        </MainLoader>
     )
 }
 
 export default BigLoader
+
+const MainLoader = styled.div`
+    position        : relative;
+    min-height      : 100vh;
+    width           : 100vw;
+    display         : flex;
+    flex-direction  : column;
+    align-items     : center;
+    justify-content : center;
+    background      : var(--content);
+    overflow        : hidden;
+`
 
 const Loader = styled.div`
     position        : relative;
@@ -67,5 +101,33 @@ const Loader = styled.div`
             stroke-dasharray  : 89, 200;
             stroke-dashoffset : -124px;
         }
+    }
+`
+
+const ProgressBar = styled.div`
+    position      : relative;
+    height        : 6px;
+    width         : 300px;
+    padding       : 0 5px;
+    margin-top    : 15px;
+    background    : var(--content-light);
+    border-radius : var(--rounded-full);
+
+    .progress-value {
+        height        : 100%;
+        width         : 0;
+        background    : var(--primary);
+        border-radius : var(--rounded-full);
+        transition    : .2s;
+    }
+
+    .percentage {
+        display         : flex;
+        justify-content : space-between;
+        text-align      : center;
+        font-size       : 18px;
+        color           : var(--primary);
+        margin-top      : 15px;
+        font-weight     : 500;
     }
 `

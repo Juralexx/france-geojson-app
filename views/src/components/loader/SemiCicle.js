@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import Icon from '../tools/icons/Icon'
 
 const SemiCicle = (props) => {
     return (
