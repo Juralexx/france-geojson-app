@@ -15,16 +15,23 @@ import Head from "./Head";
 import { HelmetProvider } from "react-helmet-async";
 import Sidebar from "./components/Sidebar";
 import { doesAllArraysInElementContainValues } from "./components/Utils";
-import SemiCicle from "./components/loader/SemiCicle";
+import BigLoader from "./components/loader/BigLoader";
 
 function App() {
+    // All geojsons datas
     const [geojsons, setGeojsons] = React.useState({})
+
+    // Leaflet geojson object
+    const [geoJSON, setGeoJSON] = React.useState({})
 
     React.useEffect(() => {
         const fetchGeojsons = async () => {
             await axios
                 .get(`${process.env.REACT_APP_API_URL}api/`)
-                .then(res => setGeojsons(res.data))
+                .then(res => {
+                    setGeojsons(res.data)
+                    setGeoJSON(res.data['Régions'])
+                })
                 .catch(err => console.log(err))
         }
         fetchGeojsons()
@@ -62,9 +69,6 @@ function App() {
     // Open sidebar
     const [open, setOpen] = React.useState(false)
 
-    // Leaflet geojson object
-    const [geoJSON, setGeoJSON] = React.useState(geojsons['Régions'] || {})
-
     // Leaflet properties
     const [leaflet, setLeaflet] = React.useState({ zoomAction: '', zoom: 6 })
 
@@ -99,11 +103,11 @@ function App() {
             <HelmetProvider>
                 <Head />
             </HelmetProvider>
-            {Object.keys(geojsons).length > 0 ? (
-                <LeafletContext.Provider value={{ geojsons, geoJSON, setGeoJSON, leaflet, setLeaflet }}>
-                    <SelectionContext.Provider value={{ selected, setSelected, arborescence, setArborescence, hovered, setHovered }}>
-                        <RootContainer>
-                            <GlobalStyles />
+            <RootContainer>
+                <GlobalStyles />
+                {Object.keys(geojsons).length > 0 ? (
+                    <LeafletContext.Provider value={{ geojsons, geoJSON, setGeoJSON, leaflet, setLeaflet }}>
+                        <SelectionContext.Provider value={{ selected, setSelected, arborescence, setArborescence, hovered, setHovered }}>
                             <SearchContext.Provider value={{ search, setSearch, fetchLocation, open, setOpen }}>
                                 <Leaflet />
                                 <SearchContainer>
@@ -118,12 +122,14 @@ function App() {
                                 open={open}
                                 setOpen={setOpen}
                             />
-                        </RootContainer>
-                    </SelectionContext.Provider>
-                </LeafletContext.Provider>
-            ) : (
-                <SemiCicle />
-            )}
+                        </SelectionContext.Provider>
+                    </LeafletContext.Provider>
+                ) : (
+                    <Loader>
+                        <BigLoader />
+                    </Loader>
+                )}
+            </RootContainer>
         </ThemeContextWrapper>
     );
 }
@@ -135,9 +141,16 @@ export default App;
  */
 
 const RootContainer = styled.div`
-    position       : relative;
-    min-height     : 100vh;
-    width          : 100vw;
+    position   : relative;
+    min-height : 100vh;
+    width      : 100vw;
+    background : var(--content);
+
+    .circle-loader {
+        .path {
+            stroke : var(--primary);
+        }
+    }
 `
 
 const SearchContainer = styled.div`
@@ -147,4 +160,15 @@ const SearchContainer = styled.div`
     width     : 30%;
     min-width : 300px;
     max-width : 350px;
+`
+
+const Loader = styled.div`
+    position        : relative;
+    min-height      : 100vh;
+    width           : 100vw;
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    background      : var(--content);
+    overflow        : hidden;
 `

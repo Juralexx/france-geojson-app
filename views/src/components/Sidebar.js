@@ -27,7 +27,7 @@ const Sidebar = ({ open, setOpen }) => {
                         cliquez sur le bouton ci-dessous.
                     </p>
                 </div>
-                <p>Développé par <a href={`${process.env.REACT_APP_BASE_URL}`} target="_blank">Alexandre Vurbier <Icon name="External" /></a></p>
+                <p>Développé par <a href={`${process.env.REACT_APP_BASE_URL}`} target="_blank" rel="noreferrer">Alexandre Vurbier <Icon name="External" /></a></p>
             </div>
         </SideMenu>
     )

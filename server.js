@@ -31,6 +31,6 @@ if (process.env.NODE_ENV !== 'production') {
 
 const PORT = process.env.PORT || 3001
 
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`Serveur démarré : http://localhost:${PORT}`)
 })

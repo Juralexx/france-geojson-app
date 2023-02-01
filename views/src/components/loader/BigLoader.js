@@ -2,17 +2,18 @@ import React from 'react'
 import styled from 'styled-components'
 import Icon from '../tools/icons/Icon'
 
-const SemiCicle = (props) => {
+const BigLoader = (props) => {
     return (
         <Loader {...props} className='circle-loader'>
             <svg className="circular" viewBox="25 25 50 50">
                 <circle className="path" cx="50" cy="50" r="20" fill="none" strokeWidth="2" strokeMiterlimit="10" />
             </svg>
+            <Icon name="France" className="icon" />
         </Loader>
     )
 }
 
-export default SemiCicle
+export default BigLoader
 
 const Loader = styled.div`
     position        : relative;
@@ -25,8 +26,8 @@ const Loader = styled.div`
 
     .circular {
         animation : rotate 2s linear infinite;
-        width     : 40px;
-        height    : 40px;
+        width     : 90px;
+        height    : 90px;
     }
 
     .path {
@@ -35,6 +36,16 @@ const Loader = styled.div`
         animation         : dash 1.5s ease-in-out infinite;
         stroke            : var(--primary);
         stroke-linecap    : round;
+    }
+
+    .icon {
+        color     : var(--primary);
+        position  : absolute;
+        left      : 50%;
+        top       : 50%;
+        transform : translate(-50%, -50%);
+        width     : 40px;
+        height    : 40px;
     }
 
     @keyframes rotate {
