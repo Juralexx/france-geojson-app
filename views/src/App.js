@@ -20,17 +20,18 @@ function App() {
     // Leaflet geojson object
     const [geoJSON, setGeoJSON] = React.useState({})
     // Axios response progress
-    const [requestProgress, setRequestProgress] = React.useState(0)
+    const [requestProgress, setRequestProgress] = React.useState(false)
 
     React.useEffect(() => {
         if (Object.keys(geojsons).length === 0) {
             const fetchGeojsons = async () => {
                 await axios
-                    .get(`${process.env.REACT_APP_API_URL}api/`, { onDownloadProgress: (progressEvent) => setRequestProgress(progressEvent.progress) })
+                    .get(`${process.env.REACT_APP_API_URL}api/`, {
+                        onDownloadProgress: (progressEvent) => !requestProgress ? setRequestProgress(true) : () => { }
+                    })
                     .then(res => {
                         setGeojsons(res.data)
                         setGeoJSON(res.data['Régions'])
-                        localStorage.setItem('geojsons', res.data['France'])
                     })
                     .catch(err => console.log(err))
             }
@@ -81,7 +82,8 @@ function App() {
                 if (doesAllArraysInElementContainValues(res)) {
                     setSearch(data => ({ ...data, locationSelected: Object.assign(res[0].fields, { ...res[1].features[0].properties }) }))
                     setGeoJSON(res[2])
-                    setArborescence(getArborescence('Départements', res[0].fields.dep_nom), geojsons)
+                    setArborescence(getArborescence('Départements', res[0].fields.dep_nom, geojsons))
+                    setLeaflet(prev => ({ ...prev, zoomAction: 'zoomIn' }))
                 } else return
             })
         } catch (err) {
