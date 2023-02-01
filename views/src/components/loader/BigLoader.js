@@ -7,12 +7,11 @@ const BigLoader = ({ requestProgress }) => {
 
     React.useEffect(() => {
         if (percentage < 100)
-            if (requestProgress < 1) {
-                const timer = setTimeout(() => {
-                    setPercentage(prev => prev + 1)
-                }, 100)
+            if (!requestProgress) {
+                const timer = setTimeout(() => setPercentage(prev => prev + 1), 100)
                 return () => clearTimeout(timer)
-            } else setPercentage(prev => prev + Math.fround(requestProgress * 100))
+            } else setPercentage(100)
+                // setPercentage(prev => prev + Math.fround(requestProgress * 100))
         else setPercentage(100)
     }, [requestProgress, percentage])
 

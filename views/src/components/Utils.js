@@ -943,6 +943,16 @@ export const addClass = (state, classe) => {
 }
 
 /**
+ * Add `active` class if condition matches
+ * @param {*} condition Condition required
+ */
+
+export const addActive = (condition) => {
+    if (condition) return 'active'
+    else return 'inactive'
+}
+
+/**
  * Reduce string between 0 and choosen length.
  * @param {*} string String to reduce
  * @param {*} maxLength Max length

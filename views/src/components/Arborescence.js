@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { LeafletContext, SearchContext, SelectionContext } from '../AppContext'
 import Icon from './tools/icons/Icon'
 import SemiCicle from './loader/SemiCicle'
-import { addClass } from './Utils'
+import { addActive, addClass } from './Utils'
 import { getLevel, getZoom } from './functions/functions'
 
 const Arborescence = () => {
@@ -29,7 +29,7 @@ const Arborescence = () => {
                         <h1>France</h1>
                         {tabs.map((tab, i) => {
                             return (
-                                <SelectionListItem className={addClass(selected.name === tab, 'active')}
+                                <SelectionListItem className={addActive(selected.name === tab)}
                                     key={i}
                                     onClick={() => {
                                         setGeoJSON(geojsons[tab])
@@ -65,7 +65,7 @@ const Arborescence = () => {
                                     {arborescence.slice(2).map((tab, i) => {
                                         return (
                                             <SelectionListItem key={i}
-                                                className={addClass(selected.name === tab.name, 'active')}
+                                                className={addActive(selected.name === tab.name)}
                                                 onClick={() => {
                                                     setGeoJSON(tab.value)
                                                     setSelected(prev => ({ ...prev, level: getLevel(tab.name), name: tab.name }))
@@ -249,8 +249,4 @@ const Tooltip = styled.div`
     border-radius : var(--rounded-sm);
     box-shadow    : var(--shadow-one);
     z-index       : 1000;
-
-    b {
-        color : var(--text-secondary);
-    }
 `

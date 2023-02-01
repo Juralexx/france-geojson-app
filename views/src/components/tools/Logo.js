@@ -22,17 +22,21 @@ const AppLogo = styled.div`
     position      : absolute;
     right         : 20px;
     top           : 20px;
-    background    : var(--content);
-    border-radius : var(--rounded-sm);
     height        : 34px;
     width         : 34px;
-    padding       : 5px;
+    padding       : 7px;
+    background    : var(--content);
+    border-radius : var(--rounded-sm);
     box-shadow    : var(--shadow-one);
     cursor        : pointer;
     z-index       : 500;
 
     a {
         color : var(--primary);
+    }
+
+    &:hover {
+        background : var(--content-light);
     }
 
     svg {

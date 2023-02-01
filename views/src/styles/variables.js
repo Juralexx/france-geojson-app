@@ -205,7 +205,7 @@ const variables = css`
 
         --svg          : #494b74;
         --svg-light    : #71739c;
-        --svg-x-light  : #71739c;
+        --svg-x-light  : #94a3b8;
         --navbar       : #ffffff;
         --navbar-txt   : #232221;
         --mini_nav-btn : #ffffff;

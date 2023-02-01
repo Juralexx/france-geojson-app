@@ -19,7 +19,7 @@ app.use(cors({
 app.use('/files', express.static('./files'))
 
 app.get('/api', (req, res) => {
-    res.send(geojsons)
+    return res.send(geojsons)
 })
 
 if (process.env.NODE_ENV !== 'production') {

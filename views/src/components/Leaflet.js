@@ -13,7 +13,7 @@ const Leaflet = () => {
     const { selected, setSelected, arborescence, setArborescence, hovered, setHovered } = React.useContext(SelectionContext)
     const { geojsons, geoJSON, setGeoJSON, leaflet, setLeaflet } = React.useContext(LeafletContext)
     const { fetchLocation } = React.useContext(SearchContext)
-    const { darkMode } = React.useContext(ThemeContext)
+    const { theme } = React.useContext(ThemeContext)
 
     const fetchGeoJSON = (propertyName) => {
         if (regions.includes(propertyName)) {
@@ -205,7 +205,7 @@ const Leaflet = () => {
                 <TileLayer
                     attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     // url={'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}
-                    url={!darkMode ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' : 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'}
+                    url={theme.theme && theme.theme === 'dark' ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png' : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}
                 />
                 {Object.keys(geoJSON).length > 0 &&
                     <ReturnGeoJSON />
