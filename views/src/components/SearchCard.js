@@ -1,15 +1,18 @@
 import React from 'react'
 import axios from 'axios'
 import styled from 'styled-components'
-import { SearchContext } from '../AppContext'
+import { LeafletContext, SearchContext, SelectionContext } from '../AppContext'
 import Icon from './tools/icons/Icon'
 import { ClassicInput } from './tools/Input'
 import SemiCicle from './loader/SemiCicle'
 import { doesAtLeastOneArrayInElementContainValues } from './Utils'
-import Logo from './tools/France'
+import { geojsons } from './functions/imports'
+import { getArborescence } from './functions/functions'
 
 const SearchCard = () => {
     const { search, setSearch, fetchLocation, open, setOpen } = React.useContext(SearchContext)
+    const { setSelected, setArborescence } = React.useContext(SelectionContext)
+    const { setGeoJSON, setLeaflet } = React.useContext(LeafletContext)
     const inputRef = React.useRef()
 
     /**
@@ -59,6 +62,30 @@ const SearchCard = () => {
      * 
      */
 
+    const fetchRegion = (region) => {
+        setGeoJSON(geojsons[region]['GeoJSON'])
+        setArborescence(getArborescence('Régions', region))
+        setSelected({ level: 1, name: 'Région' })
+        setLeaflet(prev => ({ ...prev, zoomAction: 'zoomIn' }))
+        setSearch({ state: false, query: '', results: [], isLoading: false })
+    }
+
+    /**
+     * 
+     */
+
+    const fetchDepartment = (department) => {
+        setGeoJSON(geojsons[department]['GeoJSON'])
+        setArborescence(getArborescence('Départements', department))
+        setSelected({ level: 1, name: 'Département' })
+        setLeaflet(prev => ({ ...prev, zoomAction: 'zoomIn' }))
+        setSearch({ state: false, query: '', results: [], isLoading: false })
+    }
+
+    /**
+     * 
+     */
+
     return (
         <>
             <SearchInput>
@@ -72,17 +99,9 @@ const SearchCard = () => {
                     onChange={searchLocation}
                 />
                 {search.query.length > 0 ? (
-                    <Icon
-                        name="Cross"
-                        className="search-svg"
-                        onClick={() => setSearch(data => ({ ...data, state: false, query: '' }))}
-                    />
+                    <Icon name="Cross" className="search-svg" onClick={() => setSearch(data => ({ ...data, state: false, query: '' }))} />
                 ) : (
-                    <Icon
-                        name="Search"
-                        className="search-svg"
-                        onClick={() => inputRef.current.focus()}
-                    />
+                    <Icon name="Search" className="search-svg" onClick={() => inputRef.current.focus()} />
                 )}
             </SearchInput>
 
@@ -100,17 +119,17 @@ const SearchCard = () => {
                                             fetchLocation(element.fields.com_nom)
                                             setSearch(data => ({ ...data, state: false, results: [], isLoading: false, query: '' }))
                                         }}>
-                                            <span>{`${element.fields.com_nom}`}</span> - <em>{`${element.fields.dep_nom} (${element.fields.dep_code})`}</em> <span>- {element.type}</span>
+                                            <span>{`${element.fields.com_nom}`}</span> - <em>{`${element.fields.dep_nom} (${element.fields.dep_code})`}</em>
                                         </div>
                                     }
                                     {element.type === 'département' &&
-                                        <div className="auto-complete-item" onClick={() => { }}>
-                                            <span>{`${element.nom_departement} - ${element.code_departement}`}</span> <span>- {element.type}</span>
+                                        <div className="auto-complete-item" onClick={() => fetchDepartment(element.nom_departement)}>
+                                            <span>{`${element.nom_departement} - ${element.code_departement}`}</span>
                                         </div>
                                     }
                                     {element.type === 'région' &&
-                                        <div className="auto-complete-item" onClick={() => { }}>
-                                            <span>{`${element.nom_region}`}</span> <span>- {element.type}</span>
+                                        <div className="auto-complete-item" onClick={() => fetchRegion(element.nom_region)}>
+                                            <span>{`${element.nom_region}`}</span>
                                         </div>
                                     }
                                 </div>
@@ -171,7 +190,7 @@ const AutoCompleteContainer = styled.div`
 
     .auto-complete-item {
         position  : relative;
-        padding   : 8px 16px;
+        padding   : 10px 16px;
         cursor    : pointer;
         font-size : 13px;
     
@@ -189,11 +208,6 @@ const AutoCompleteContainer = styled.div`
                 font-size    : 14px;
                 font-weight  : 500;
                 margin-right : 2px;
-            }
-            &:last-child {
-                font-size   : 12px;
-                color       : var(--text-secondary);
-                margin-left : 2px;
             }
         }
     }

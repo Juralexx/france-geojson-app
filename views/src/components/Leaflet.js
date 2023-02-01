@@ -62,15 +62,11 @@ const Leaflet = () => {
                             [geojsonBounds[3], geojsonBounds[2]],
                             [geojsonBounds[1], geojsonBounds[0]]
                         ])
-                    } else {
-                        map.flyTo(defaultCenter, 6)
-                    }
+                    } else map.flyTo(defaultCenter, 6)
 
                     if (regions.includes(previous)) {
                         setArborescence(getArborescence('Régions', previous))
                         setSelected({ level: 1, name: 'Région' })
-
-                        console.log('')
                     }
                     else if (old_regions.includes(previous)) {
                         setGeoJSON(geojsons[previous]['GeoJSON'])
@@ -82,6 +78,15 @@ const Leaflet = () => {
                         setArborescence([])
                     }
                 }
+                setLeaflet(prev => ({ ...prev, zoomAction: '' }))
+            }
+
+            if (leaflet.zoomAction === 'zoomIn') {
+                const geojsonBounds = getGeoJSONBounds(geoJSON)
+                map.flyToBounds([
+                    [geojsonBounds[3], geojsonBounds[2]],
+                    [geojsonBounds[1], geojsonBounds[0]]
+                ])
                 setLeaflet(prev => ({ ...prev, zoomAction: '' }))
             }
 

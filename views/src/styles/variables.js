@@ -239,7 +239,7 @@ const variables = css`
 
         --text           : #a8b8d7;
         --text-secondary : #ced6f8;
-        --text-tertiary  : #a8b8d7;
+        --text-tertiary  : rgb(207, 216, 220);
         --title          : #ced6f8;
 
         --light-border : #65f9de;

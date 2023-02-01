@@ -17,7 +17,11 @@ const Head = ({ title, description, image }) => {
 
     return (
         <Helmet title={metadatas.title} defaultTitle={metadatas.title} titleTemplate={`%s | ${metadatas.site_name}`}>
-            {darkMode ? <link rel="icon" href="/img/favicon-dark.ico" /> : <link rel="icon" href="/img/favicon.ico" />}
+            {darkMode ? (
+                <link rel="icon" href="/img/favicon-dark.ico" />
+            ) : (
+                <link rel="icon" href="/img/favicon.ico" />
+            )}
             <meta name="description" content={metadatas.description} />
             <meta name="image" content={metadatas.image} />
 

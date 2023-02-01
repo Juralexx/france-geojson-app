@@ -44,7 +44,7 @@ const GlobalStyles = createGlobalStyle`
     }
 
     ::selection {
-        background-color : rgba(var(--primary-rgb), 0.2);
+        background-color : rgba(var(--primary-rgb), 0.25);
         color            : var(--primary);
     }
 
