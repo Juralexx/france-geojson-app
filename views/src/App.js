@@ -8,9 +8,13 @@ import Arborescence from "./components/Arborescence";
 import { LeafletContext, SearchContext, SelectionContext } from "./AppContext";
 import { geojsons } from "./components/functions/imports";
 import { getArborescence } from "./components/functions/functions";
-import Logo from "./components/Logo";
 import ThemeToggle from "./components/theme/ThemeToggle";
 import ThemeContextWrapper from "./components/theme/ThemeContextWrapper";
+import Logo from "./components/tools/Logo";
+import France from "./components/tools/France";
+import Head from "./Head";
+import { HelmetProvider } from "react-helmet-async";
+import Sidebar from "./components/Sidebar";
 
 function App() {
     // Level and element name selected
@@ -45,6 +49,9 @@ function App() {
         locationSelected: {}
     })
 
+    // Open sidebar
+    const [open, setOpen] = React.useState(false)
+
     // Leaflet geojson object
     const [geoJSON, setGeoJSON] = React.useState(geojsons['Régions'])
 
@@ -78,19 +85,33 @@ function App() {
 
     return (
         <ThemeContextWrapper>
-            <LeafletContext.Provider value={{ geoJSON, setGeoJSON, leaflet, setLeaflet }}>
-                <SelectionContext.Provider value={{ selected, setSelected, arborescence, setArborescence, hovered, setHovered }}>
+            <HelmetProvider>
+                <Head />
+            </HelmetProvider>
+            <LeafletContext.Provider
+                value={{ geoJSON, setGeoJSON, leaflet, setLeaflet }}
+            >
+                <SelectionContext.Provider
+                    value={{ selected, setSelected, arborescence, setArborescence, hovered, setHovered }}
+                >
                     <RootContainer>
                         <GlobalStyles />
                         <Leaflet />
-                        <SearchContext.Provider value={{ search, setSearch, fetchLocation }}>
+                        <SearchContext.Provider
+                            value={{ search, setSearch, fetchLocation, open, setOpen }}
+                        >
                             <SearchContainer>
                                 <SearchCard />
                                 <Arborescence />
                             </SearchContainer>
                         </SearchContext.Provider>
+                        <France />
                         <Logo />
                         <ThemeToggle />
+                        <Sidebar
+                            open={open}
+                            setOpen={setOpen}
+                        />
                     </RootContainer>
                 </SelectionContext.Provider>
             </LeafletContext.Provider>

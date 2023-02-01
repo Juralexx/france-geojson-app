@@ -227,8 +227,8 @@ const variables = css`
         --primary-light     : #65f9de;
         --primary-light-rgb : 36, 89, 178;
 
-        --secondary           : #e11a81;
-        --secondary-rgb       : 225, 26, 129;
+        --secondary           : #65f9de;
+        --secondary-rgb       : 12, 65, 154;
         --secondary-light     : #E43E94;
         --secondary-light-rgb : 228, 62, 148;
 

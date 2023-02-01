@@ -6,8 +6,6 @@ import { ThemeContext } from './ThemeContextWrapper';
 const ThemeToggle = () => {
     const { darkMode, handleTheme } = React.useContext(ThemeContext)
 
-    console.log(darkMode)
-
     return (
         !darkMode ? (
             <Toggle onClick={() => handleTheme()}>
@@ -25,7 +23,7 @@ export default ThemeToggle
 
 const Toggle = styled.button`
     position      : absolute;
-    right         : 20px;
+    right         : 60px;
     top           : 20px;
     background    : var(--content);
     border-radius : var(--rounded-sm);
@@ -35,5 +33,5 @@ const Toggle = styled.button`
     color         : var(--primary);
     box-shadow    : var(--shadow-one);
     cursor        : pointer;
-    z-index       : 1500;
+    z-index       : 500;
 `

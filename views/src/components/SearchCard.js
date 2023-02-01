@@ -6,10 +6,10 @@ import Icon from './tools/icons/Icon'
 import { ClassicInput } from './tools/Input'
 import SemiCicle from './loader/SemiCicle'
 import { doesAtLeastOneArrayInElementContainValues } from './Utils'
-import Logo from './Logo'
+import Logo from './tools/France'
 
 const SearchCard = () => {
-    const { search, setSearch, fetchLocation } = React.useContext(SearchContext)
+    const { search, setSearch, fetchLocation, open, setOpen } = React.useContext(SearchContext)
     const inputRef = React.useRef()
 
     /**
@@ -62,7 +62,7 @@ const SearchCard = () => {
     return (
         <>
             <SearchInput>
-                <Icon name="Menu" className="menu-svg" />
+                <Icon name="Menu" className="menu-svg" onClick={() => setOpen(!open)} />
                 <ClassicInput
                     useRef={inputRef}
                     type="text"
