@@ -43,8 +43,8 @@ export const removeBodyClass = (className) => {
  */
 
 export const replaceBodyClass = (classToAdd, classToRemove) => {
-    document.body.classList.add(classToAdd)
     document.body.classList.remove(classToRemove)
+    document.body.classList.add(classToAdd)
 }
 
 /**

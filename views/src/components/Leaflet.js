@@ -2,16 +2,18 @@ import React from 'react'
 import styled from 'styled-components';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
-import { GeoJSONContext, SelectionContext } from '../AppContext';
+import { LeafletContext, SelectionContext } from '../AppContext';
 import { getArborescence, getGeoJSONBounds, getZoom } from './functions/functions'
-import { departements_old_regions, departements_regions, departments, old_regions, regions } from './functions/api'
+import { departements_regions, departments, old_regions, regions } from './functions/api'
 import { geojsons } from './functions/imports';
 import { doesStringIncludes } from './Utils'
+import { ThemeContext } from './theme/ThemeContextWrapper';
 
 const Leaflet = () => {
     const defaultCenter = [47.29580115135585, -0.034327425932688935]
     const { selected, setSelected, arborescence, setArborescence, hovered, setHovered } = React.useContext(SelectionContext)
-    const { geoJSON, setGeoJSON, leaflet, setLeaflet } = React.useContext(GeoJSONContext)
+    const { geoJSON, setGeoJSON, leaflet, setLeaflet } = React.useContext(LeafletContext)
+    const { darkMode } = React.useContext(ThemeContext)
 
     const fetchGeoJSON = (propertyName) => {
         if (regions.includes(propertyName)) {
@@ -67,6 +69,8 @@ const Leaflet = () => {
                     if (regions.includes(previous)) {
                         setArborescence(getArborescence('Régions', previous))
                         setSelected({ level: 1, name: 'Région' })
+
+                        console.log('')
                     }
                     else if (old_regions.includes(previous)) {
                         setGeoJSON(geojsons[previous]['GeoJSON'])
@@ -80,9 +84,16 @@ const Leaflet = () => {
                 }
                 setLeaflet(prev => ({ ...prev, zoomAction: '' }))
             }
+
+            if (selected.name === 'Commune') {
+                const geojsonBounds = getGeoJSONBounds(geoJSON)
+                map.flyToBounds([
+                    [geojsonBounds[3], geojsonBounds[2]],
+                    [geojsonBounds[1], geojsonBounds[0]]
+                ])
+            }
         }, [])
 
- 
         return (
             <GeoJSON
                 data={geoJSON}
@@ -186,7 +197,7 @@ const Leaflet = () => {
             >
                 <TileLayer
                     attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                    url={!darkMode ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' : 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'}
                 />
                 {Object.keys(geoJSON).length > 0 &&
                     <ReturnGeoJSON />
@@ -208,8 +219,8 @@ const LeafletContainer = styled.div`
     height   : 100vh;
 
     .leaflet-tile-pane {
-        -webkit-filter: grayscale(100%);
-        filter: grayscale(100%);
+        -webkit-filter : grayscale(100%);
+        filter         : grayscale(100%);
     }
     .leaflet-control-container {
         .leaflet-top.leaflet-left {
@@ -221,19 +232,24 @@ const LeafletContainer = styled.div`
         } 
     }
     .leaflet-container {
+        .leaflet-control-attribution {
+            background-color : var(--content);
+        }
         a {
             color : var(--primary);
         }
     }
     .leaflet-touch {
         .leaflet-bar {
-            border        : none;
-            box-shadow    : var(--shadow-smooth), var(--shadow-relief);
+            border     : none;
+            box-shadow : var(--shadow-smooth), var(--shadow-relief);
             span {
                 color : var(--primary);
             }
             a {
+                background-color : var(--content);
                 &:first-child {
+                    border-bottom           : 1px solid var(--primary);
                     border-top-left-radius  : var(--rounded-sm);
                     border-top-right-radius : var(--rounded-sm);
                 }
@@ -246,6 +262,7 @@ const LeafletContainer = styled.div`
     }
     .leaflet-interactive {
         stroke       : var(--primary-light);
+        stroke-width : 2px;
         fill         : var(--primary-light);
         fill-opacity : 0.3;
 

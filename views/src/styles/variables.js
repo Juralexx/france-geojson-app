@@ -125,7 +125,7 @@ const variables = css`
         --rounded-3xl  : 14px;
         --rounded-full : 9999px;
 
-        --shadow-one          : 0px 12px 34px rgb(32 52 89 / 25%);
+        --shadow-one          : 0px 12px 34px rgb(32 52 89 / 15%);
         --shadow-two          : 0px 9px 28px 0px rgb(0 0 0 / 15%);
         --shadow-three        : 0 10px 20px 0 rgb(0 0 0 / 5%);
         --shadow-smooth       : 0px 9px 26px 0px rgb(0 0 0 / 15%);
@@ -193,8 +193,8 @@ const variables = css`
         --content-x-light : #ffffff;
 
         --text           : #434343;
-        --text-secondary : #90a4ae;
-        --text-tertiary  : #aaa9a9;
+        --text-secondary : #aaa9a9;
+        --text-tertiary  : rgb(207, 216, 220);
         --title          : #2f1c6a;
 
         --light-border : #DCDEDD;
@@ -219,6 +219,34 @@ const variables = css`
         --shadow-x-tiny     : 0 1px 3px 0 rgb(0 0 0 / 10%),     0 1px 2px 0 rgb(0 0 0 / 6%);
         --shadow-tiny-right : -2px 0 6px 1px rgba(0 0 0 / 15%);
         --shadow-tiny-left  : 8px 0 6px -5px rgb(0 0 0 / 15%);
+    }
+
+    .dark {
+        --primary           : #65f9de;
+        --primary-rgb       : 12, 65, 154;
+        --primary-light     : #65f9de;
+        --primary-light-rgb : 36, 89, 178;
+
+        --secondary           : #e11a81;
+        --secondary-rgb       : 225, 26, 129;
+        --secondary-light     : #E43E94;
+        --secondary-light-rgb : 228, 62, 148;
+
+        --body            : var(--dark-navy);
+        --content         : var(--navy);
+        --content-light   : var(--light-navy);
+        --content-x-light : #ffffff;
+
+        --text           : #a8b8d7;
+        --text-secondary : #ced6f8;
+        --text-tertiary  : #a8b8d7;
+        --title          : #ced6f8;
+
+        --light-border : #65f9de;
+
+        --input       : var(--xx-light);
+        --input-text  : #ffffff;
+        --placeholder : #a8b8d7;
     }
 `;
 

@@ -6,10 +6,15 @@ import Icon from './tools/icons/Icon'
 import { ClassicInput } from './tools/Input'
 import SemiCicle from './loader/SemiCicle'
 import { doesAtLeastOneArrayInElementContainValues } from './Utils'
+import Logo from './Logo'
 
 const SearchCard = () => {
-    const { search, setSearch } = React.useContext(SearchContext)
+    const { search, setSearch, fetchLocation } = React.useContext(SearchContext)
     const inputRef = React.useRef()
+
+    /**
+     * 
+     */
 
     const searchLocation = async () => {
         if (!search.query || search.query.trim() === "") return
@@ -50,6 +55,10 @@ const SearchCard = () => {
         }
     }
 
+    /**
+     * 
+     */
+
     return (
         <>
             <SearchInput>
@@ -87,7 +96,10 @@ const SearchCard = () => {
                             return (
                                 <div key={key}>
                                     {element.type === 'commune' &&
-                                        <div className="auto-complete-item" onClick={() => { }}>
+                                        <div className="auto-complete-item" onClick={() => {
+                                            fetchLocation(element.fields.com_nom)
+                                            setSearch(data => ({ ...data, state: false, results: [], isLoading: false, query: '' }))
+                                        }}>
                                             <span>{`${element.fields.com_nom}`}</span> - <em>{`${element.fields.dep_nom} (${element.fields.dep_code})`}</em> <span>- {element.type}</span>
                                         </div>
                                     }

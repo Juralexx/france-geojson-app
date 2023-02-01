@@ -105,7 +105,6 @@ export const getArborescence = (type, name) => {
                 }]
             )
         }
-
         default:
             break;
     }

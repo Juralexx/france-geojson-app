@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { GeoJSONContext, SearchContext, SelectionContext } from '../AppContext'
+import { LeafletContext, SearchContext, SelectionContext } from '../AppContext'
 import Icon from './tools/icons/Icon'
 import SemiCicle from './loader/SemiCicle'
 import { addClass } from './Utils'
@@ -10,7 +10,7 @@ import { getLevel, getZoom } from './functions/functions'
 const Arborescence = () => {
     const { selected, setSelected, arborescence, hovered } = React.useContext(SelectionContext)
     const { search } = React.useContext(SearchContext)
-    const { setGeoJSON, setLeaflet } = React.useContext(GeoJSONContext)
+    const { setGeoJSON, setLeaflet } = React.useContext(LeafletContext)
     const [isLoading, setLoading] = React.useState(false)
 
     const tabs = ['France', 'Régions', 'Anciennes régions', 'Départements']
@@ -65,12 +65,15 @@ const Arborescence = () => {
                                     <h2>{arborescence[1].name}</h2>
                                     {arborescence.slice(2).map((tab, i) => {
                                         return (
-                                            <SelectionListItem className={addClass(selected.name === tab.name, 'active')}
-                                                key={i}
+                                            <SelectionListItem key={i}
+                                                className={addClass(selected.name === tab.name, 'active')}
                                                 onClick={() => {
                                                     setGeoJSON(tab.value)
                                                     setSelected(prev => ({ ...prev, level: getLevel(tab.name), name: tab.name }))
                                                     setLoading(true)
+                                                    if (selected.name === 'Commune') {
+                                                        setLeaflet(prev => ({ ...prev, zoomAction: 'zoomOut' }))
+                                                    }
                                                 }}
                                             >
                                                 {selected.name === tab.name ? (
@@ -88,7 +91,7 @@ const Arborescence = () => {
                     })
                 )
             )}
-            {hovered.active &&
+            {hovered.active && selected.name !== 'Commune' &&
                 <Tooltip>
                     <h5>Informations</h5>
                     {hovered.element.region &&
@@ -107,6 +110,23 @@ const Arborescence = () => {
                         <p><b>Commune :</b> {hovered.element.commune}</p>
                     }
                 </Tooltip>
+            }
+            {selected.name === 'Commune' && Object.keys(search.locationSelected).length > 0 &&
+                <SelectionList>
+                    <div className='previous' onClick={() => {
+                        setGeoJSON(arborescence[0].value)
+                        setLeaflet({ zoomAction: 'zoomOut', zoom: getZoom(arborescence[0].previous) })
+                        setSelected(prev => ({ ...prev, level: getLevel(arborescence[0].previous), name: arborescence[0].previous }))
+                    }}></div>
+                    <h3>{search.locationSelected.com_nom}</h3>
+                    <p><b>Commune :</b> {search.locationSelected.com_nom}</p>
+                    <p><b>Municipalité :</b> {search.locationSelected.municipality}</p>
+                    <p><b>Population :</b> {search.locationSelected.population}</p>
+                    <p><b>Région :</b> {search.locationSelected.reg_nom}</p>
+                    <p><b>Ancienne région :</b> {search.locationSelected.reg_nom_old}</p>
+                    <p><b>Département :</b> {search.locationSelected.dep_nom}</p>
+                    <p><b>Code département :</b> {search.locationSelected.dep_code}</p>
+                </SelectionList>
             }
         </>
     )
@@ -127,7 +147,6 @@ const SelectionList = styled.div`
         font-weight : 700;
         margin      : 0;
         padding     : 15px 30px;
-        color       : var(--title);
     }
 
     h2 {
@@ -135,7 +154,17 @@ const SelectionList = styled.div`
         font-weight : 700;
         margin      : 0;
         padding     : 5px 30px;
-        color       : var(--title);
+    }
+
+    h3 {
+        font-size   : 22px;
+        font-weight : 700;
+        margin      : 0;
+        padding     : 5px 20px;
+    }
+
+    p {
+        padding : 3px 20px;
     }
 
     .previous {
@@ -165,7 +194,7 @@ const SelectionListItem = styled.div`
     position    : relative;
     padding     : 20px 40px 20px 75px;
     font-size   : 16px;
-    color       : var(--text-tertiary);
+    color       : var(--text-secondary);
     border-left : 4px solid transparent;
     cursor      : pointer;
 
@@ -174,7 +203,7 @@ const SelectionListItem = styled.div`
         left      : 40px;
         top       : 50%;
         transform : translateY(-50%);
-        color     : rgb(207, 216, 220);
+        color     : var(--text-tertiary);
         width     : 14px;
         height    : 14px;
     }
@@ -221,4 +250,8 @@ const Tooltip = styled.div`
     border-radius : var(--rounded-sm);
     box-shadow    : var(--shadow-one);
     z-index       : 1000;
+
+    b {
+        color : var(--text-secondary);
+    }
 `
