@@ -6,13 +6,12 @@ import Icon from './tools/icons/Icon'
 import { ClassicInput } from './tools/Input'
 import SemiCicle from './loader/SemiCicle'
 import { doesAtLeastOneArrayInElementContainValues } from './Utils'
-import { geojsons } from './functions/imports'
 import { getArborescence } from './functions/functions'
 
 const SearchCard = () => {
     const { search, setSearch, fetchLocation, open, setOpen } = React.useContext(SearchContext)
     const { setSelected, setArborescence } = React.useContext(SelectionContext)
-    const { setGeoJSON, setLeaflet } = React.useContext(LeafletContext)
+    const { geojsons, setGeoJSON, setLeaflet } = React.useContext(LeafletContext)
     const inputRef = React.useRef()
 
     /**
@@ -64,7 +63,7 @@ const SearchCard = () => {
 
     const fetchRegion = (region) => {
         setGeoJSON(geojsons[region]['GeoJSON'])
-        setArborescence(getArborescence('Régions', region))
+        setArborescence(getArborescence('Régions', region, geojsons))
         setSelected({ level: 1, name: 'Région' })
         setLeaflet(prev => ({ ...prev, zoomAction: 'zoomIn' }))
         setSearch({ state: false, query: '', results: [], isLoading: false })
@@ -76,7 +75,7 @@ const SearchCard = () => {
 
     const fetchDepartment = (department) => {
         setGeoJSON(geojsons[department]['GeoJSON'])
-        setArborescence(getArborescence('Départements', department))
+        setArborescence(getArborescence('Départements', department, geojsons))
         setSelected({ level: 1, name: 'Département' })
         setLeaflet(prev => ({ ...prev, zoomAction: 'zoomIn' }))
         setSearch({ state: false, query: '', results: [], isLoading: false })

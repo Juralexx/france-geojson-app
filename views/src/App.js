@@ -6,7 +6,6 @@ import Leaflet from "./components/Leaflet";
 import SearchCard from "./components/SearchCard";
 import Arborescence from "./components/Arborescence";
 import { LeafletContext, SearchContext, SelectionContext } from "./AppContext";
-import { geojsons } from "./components/functions/imports";
 import { getArborescence } from "./components/functions/functions";
 import ThemeToggle from "./components/theme/ThemeToggle";
 import ThemeContextWrapper from "./components/theme/ThemeContextWrapper";
@@ -15,14 +14,25 @@ import France from "./components/tools/France";
 import Head from "./Head";
 import { HelmetProvider } from "react-helmet-async";
 import Sidebar from "./components/Sidebar";
+import { doesAllArraysInElementContainValues } from "./components/Utils";
+import SemiCicle from "./components/loader/SemiCicle";
 
 function App() {
+    const [geojsons, setGeojsons] = React.useState({})
+
+    React.useEffect(() => {
+        const fetchGeojsons = async () => {
+            await axios
+                .get(`${process.env.REACT_APP_API_URL}api/`)
+                .then(res => setGeojsons(res.data))
+                .catch(err => console.log(err))
+        }
+        fetchGeojsons()
+    }, [])
+
     // Level and element name selected
     // France - 0 , Régions - 1, Anciennes Régions - 1, Départements - 2, Arrodissements - 3, Canton - 4, Communes - 4, Commune - 4
-    const [selected, setSelected] = React.useState({
-        level: 0,
-        name: 'Régions'
-    })
+    const [selected, setSelected] = React.useState({ level: 0, name: 'Régions' })
 
     // Arborescence card
     const [arborescence, setArborescence] = React.useState([])
@@ -53,7 +63,7 @@ function App() {
     const [open, setOpen] = React.useState(false)
 
     // Leaflet geojson object
-    const [geoJSON, setGeoJSON] = React.useState(geojsons['Régions'])
+    const [geoJSON, setGeoJSON] = React.useState(geojsons['Régions'] || {})
 
     // Leaflet properties
     const [leaflet, setLeaflet] = React.useState({ zoomAction: '', zoom: 6 })
@@ -73,10 +83,11 @@ function App() {
                     .catch(err => console.error(err))
             })
             Promise.all(response).then(res => {
-                setSearch(data => ({ ...data, locationSelected: Object.assign(res[0].fields, { ...res[1].features[0].properties }) }))
-                setGeoJSON(res[2])
-                setArborescence(getArborescence('Départements', res[0].fields.dep_nom))
-                setSelected({ level: 3, name: 'Commune' })
+                if (doesAllArraysInElementContainValues(res)) {
+                    setSearch(data => ({ ...data, locationSelected: Object.assign(res[0].fields, { ...res[1].features[0].properties }) }))
+                    setGeoJSON(res[2])
+                    setArborescence(getArborescence('Départements', res[0].fields.dep_nom))
+                } else return
             })
         } catch (err) {
             console.error(err)
@@ -88,33 +99,31 @@ function App() {
             <HelmetProvider>
                 <Head />
             </HelmetProvider>
-            <LeafletContext.Provider
-                value={{ geoJSON, setGeoJSON, leaflet, setLeaflet }}
-            >
-                <SelectionContext.Provider
-                    value={{ selected, setSelected, arborescence, setArborescence, hovered, setHovered }}
-                >
-                    <RootContainer>
-                        <GlobalStyles />
-                        <Leaflet />
-                        <SearchContext.Provider
-                            value={{ search, setSearch, fetchLocation, open, setOpen }}
-                        >
-                            <SearchContainer>
-                                <SearchCard />
-                                <Arborescence />
-                            </SearchContainer>
-                        </SearchContext.Provider>
-                        <France />
-                        <Logo />
-                        <ThemeToggle />
-                        <Sidebar
-                            open={open}
-                            setOpen={setOpen}
-                        />
-                    </RootContainer>
-                </SelectionContext.Provider>
-            </LeafletContext.Provider>
+            {Object.keys(geojsons).length > 0 ? (
+                <LeafletContext.Provider value={{ geojsons, geoJSON, setGeoJSON, leaflet, setLeaflet }}>
+                    <SelectionContext.Provider value={{ selected, setSelected, arborescence, setArborescence, hovered, setHovered }}>
+                        <RootContainer>
+                            <GlobalStyles />
+                            <SearchContext.Provider value={{ search, setSearch, fetchLocation, open, setOpen }}>
+                                <Leaflet />
+                                <SearchContainer>
+                                    <SearchCard />
+                                    <Arborescence />
+                                </SearchContainer>
+                            </SearchContext.Provider>
+                            <France />
+                            <Logo />
+                            <ThemeToggle />
+                            <Sidebar
+                                open={open}
+                                setOpen={setOpen}
+                            />
+                        </RootContainer>
+                    </SelectionContext.Provider>
+                </LeafletContext.Provider>
+            ) : (
+                <SemiCicle />
+            )}
         </ThemeContextWrapper>
     );
 }

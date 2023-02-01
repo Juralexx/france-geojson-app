@@ -1,5 +1,4 @@
 import { departements_regions, departments, old_regions, regions } from "./api"
-import { geojsons } from "./imports"
 
 export const getZoom = (selectedType) => {
     if (selectedType === 'France' || selectedType === 'Régions' || selectedType === 'Anciennes régions')
@@ -51,7 +50,7 @@ export const getLevel = (selectedLevel) => {
  * 
  */
 
-export const getArborescence = (type, name) => {
+export const getArborescence = (type, name, geojsons) => {
     switch (type) {
         case ('Régions' || 'Anciennes régions'): {
             const region = geojsons[name]

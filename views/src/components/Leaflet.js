@@ -2,31 +2,31 @@ import React from 'react'
 import styled from 'styled-components';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
-import { LeafletContext, SelectionContext } from '../AppContext';
+import { LeafletContext, SearchContext, SelectionContext } from '../AppContext';
 import { getArborescence, getGeoJSONBounds, getZoom } from './functions/functions'
 import { departements_regions, departments, old_regions, regions } from './functions/api'
-import { geojsons } from './functions/imports';
 import { doesStringIncludes } from './Utils'
 import { ThemeContext } from './theme/ThemeContextWrapper';
 
 const Leaflet = () => {
     const defaultCenter = [47.29580115135585, -0.034327425932688935]
     const { selected, setSelected, arborescence, setArborescence, hovered, setHovered } = React.useContext(SelectionContext)
-    const { geoJSON, setGeoJSON, leaflet, setLeaflet } = React.useContext(LeafletContext)
+    const { geojsons, geoJSON, setGeoJSON, leaflet, setLeaflet } = React.useContext(LeafletContext)
+    const { fetchLocation } = React.useContext(SearchContext)
     const { darkMode } = React.useContext(ThemeContext)
 
     const fetchGeoJSON = (propertyName) => {
         if (regions.includes(propertyName)) {
             setGeoJSON(geojsons[propertyName]['GeoJSON'])
-            setArborescence(getArborescence('Régions', propertyName))
+            setArborescence(getArborescence('Régions', propertyName, geojsons))
         }
         else if (old_regions.includes(propertyName)) {
             setGeoJSON(geojsons[propertyName]['GeoJSON'])
-            setArborescence(getArborescence('Anciennes régions', propertyName))
+            setArborescence(getArborescence('Anciennes régions', propertyName, geojsons))
         }
         else if (departments.includes(propertyName)) {
             setGeoJSON(geojsons[propertyName]['GeoJSON'])
-            setArborescence(getArborescence('Départements', propertyName))
+            setArborescence(getArborescence('Départements', propertyName, geojsons))
         }
     }
 
@@ -65,12 +65,12 @@ const Leaflet = () => {
                     } else map.flyTo(defaultCenter, 6)
 
                     if (regions.includes(previous)) {
-                        setArborescence(getArborescence('Régions', previous))
+                        setArborescence(getArborescence('Régions', previous, geojsons))
                         setSelected({ level: 1, name: 'Région' })
                     }
                     else if (old_regions.includes(previous)) {
                         setGeoJSON(geojsons[previous]['GeoJSON'])
-                        setArborescence(getArborescence('Anciennes régions', previous))
+                        setArborescence(getArborescence('Anciennes régions', previous, geojsons))
                         setSelected({ level: 1, name: 'Région' })
                     }
                     else {
@@ -110,6 +110,8 @@ const Leaflet = () => {
                                 setLeaflet({ zoomAction: 'zoomIn', zoom: getZoom(selected.level) })
                                 zoomToFeature(event, layer)
                                 fetchGeoJSON(nom)
+                            } else if (selected.name === 'Communes') {
+                                fetchLocation(layer.feature.properties.nom)
                             }
                         },
                         mouseout: () => {
@@ -202,6 +204,7 @@ const Leaflet = () => {
             >
                 <TileLayer
                     attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    // url={'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}
                     url={!darkMode ? 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' : 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'}
                 />
                 {Object.keys(geoJSON).length > 0 &&

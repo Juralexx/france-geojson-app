@@ -4,13 +4,12 @@ import { LeafletContext, SearchContext, SelectionContext } from '../AppContext'
 import Icon from './tools/icons/Icon'
 import SemiCicle from './loader/SemiCicle'
 import { addClass } from './Utils'
-import { geojsons } from './functions/imports'
 import { getLevel, getZoom } from './functions/functions'
 
 const Arborescence = () => {
     const { selected, setSelected, arborescence, hovered } = React.useContext(SelectionContext)
     const { search } = React.useContext(SearchContext)
-    const { setGeoJSON, setLeaflet } = React.useContext(LeafletContext)
+    const { geojsons, setGeoJSON, setLeaflet } = React.useContext(LeafletContext)
     const [isLoading, setLoading] = React.useState(false)
 
     const tabs = ['France', 'Régions', 'Anciennes régions', 'Départements']
@@ -119,13 +118,13 @@ const Arborescence = () => {
                         setSelected(prev => ({ ...prev, level: getLevel(arborescence[0].previous), name: arborescence[0].previous }))
                     }}></div>
                     <h3>{search.locationSelected.com_nom}</h3>
-                    <p><b>Commune :</b> {search.locationSelected.com_nom}</p>
+                    <p><b>Commune :</b> {search.locationSelected.city}</p>
                     <p><b>Municipalité :</b> {search.locationSelected.municipality}</p>
                     <p><b>Population :</b> {search.locationSelected.population}</p>
-                    <p><b>Région :</b> {search.locationSelected.reg_nom}</p>
-                    <p><b>Ancienne région :</b> {search.locationSelected.reg_nom_old}</p>
-                    <p><b>Département :</b> {search.locationSelected.dep_nom}</p>
-                    <p><b>Code département :</b> {search.locationSelected.dep_code}</p>
+                    <p><b>Région :</b> {search.locationSelected?.reg_nom}</p>
+                    <p><b>Ancienne région :</b> {search.locationSelected?.reg_nom_old}</p>
+                    <p><b>Département :</b> {search.locationSelected?.dep_nom}</p>
+                    <p><b>Code département :</b> {search.locationSelected?.dep_code}</p>
                 </SelectionList>
             }
         </>

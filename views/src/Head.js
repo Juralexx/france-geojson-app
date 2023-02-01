@@ -1,9 +1,7 @@
 import React from 'react'
 import { Helmet } from 'react-helmet-async'
-import { ThemeContext } from './components/theme/ThemeContextWrapper'
 
 const Head = ({ title, description, image }) => {
-    const { darkMode } = React.useContext(ThemeContext)
 
     const pathname = typeof window !== 'undefined' ? window.location.pathname : ''
 
@@ -17,11 +15,7 @@ const Head = ({ title, description, image }) => {
 
     return (
         <Helmet title={metadatas.title} defaultTitle={metadatas.title} titleTemplate={`%s | ${metadatas.site_name}`}>
-            {darkMode ? (
-                <link rel="icon" href="/img/favicon-dark.ico" />
-            ) : (
-                <link rel="icon" href="/img/favicon.ico" />
-            )}
+            <link rel="icon" href="/img/favicon-dark.ico" />
             <meta name="description" content={metadatas.description} />
             <meta name="image" content={metadatas.image} />
 
