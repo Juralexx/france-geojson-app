@@ -29,7 +29,7 @@ const inputProps = (props) => {
 export const ClassicInput = (props) => {
     const { useRef, value, defaultValue, className, cross, onClean } = props
     return (
-        <InputClassic className={`${className ? 'classic-input ' + className : 'classic-input'}`}>
+        <InputClassic className={className}>
             <input
                 ref={useRef}
                 {...inputProps(props)}

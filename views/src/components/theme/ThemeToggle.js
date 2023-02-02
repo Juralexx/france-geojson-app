@@ -46,6 +46,11 @@ const ThemeMenu = styled.div`
     position : absolute;
     right    : 60px;
     top      : 20px;
+
+    @media(max-width: 768px) {
+        top   : 0;
+        right : 40px;
+    }
 `
 
 const ThemeContainer = styled.div`
@@ -86,17 +91,27 @@ const ThemeContainer = styled.div`
 `
 
 const Toggle = styled.button`
-    background    : var(--content);
-    border-radius : var(--rounded-sm);
-    height        : 34px;
-    width         : 34px;
-    padding       : 5px;
-    color         : var(--primary);
-    box-shadow    : var(--shadow-one);
-    cursor        : pointer;
-    z-index       : 500;
+    background      : var(--content);
+    border-radius   : var(--rounded-sm);
+    height          : 34px;
+    width           : 34px;
+    padding         : 4px;
+    display         : flex;
+    align-items     : center;
+    justify-content : center;
+    color           : var(--primary);
+    box-shadow      : var(--shadow-one);
+    cursor          : pointer;
+    z-index         : 500;
 
     &:hover {
         background : var(--content-light);
+    }
+
+    @media(max-width: 768px) {
+        height        : 44px;
+        width         : 40px;
+        border-radius : 0;
+        box-shadow    : none;
     }
 `

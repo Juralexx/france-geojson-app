@@ -11,7 +11,7 @@ const BigLoader = ({ requestProgress }) => {
                 const timer = setTimeout(() => setPercentage(prev => prev + 1), 100)
                 return () => clearTimeout(timer)
             } else setPercentage(100)
-                // setPercentage(prev => prev + Math.fround(requestProgress * 100))
+        // setPercentage(prev => prev + Math.fround(requestProgress * 100))
         else setPercentage(100)
     }, [requestProgress, percentage])
 
@@ -24,7 +24,9 @@ const BigLoader = ({ requestProgress }) => {
                 <Icon name="France" className="icon" />
             </Loader>
             <ProgressBar>
-                <div className="progress-value" style={{ width: `${percentage}%` }}></div>
+                <div className='progress-bar'>
+                    <div className="progress-value" style={{ width: `${percentage}%` }}></div>
+                </div>
                 <div className="percentage">
                     <div>Chargement...</div>
                     <div>{percentage || 0}%</div>
@@ -51,7 +53,6 @@ const MainLoader = styled.div`
 const Loader = styled.div`
     position        : relative;
     width           : 100%;
-    height          : 100%;
     display         : flex;
     align-items     : center;
     justify-content : center;
@@ -104,20 +105,24 @@ const Loader = styled.div`
 `
 
 const ProgressBar = styled.div`
-    position      : relative;
-    height        : 6px;
-    width         : 300px;
-    padding       : 0 5px;
-    margin-top    : 15px;
-    background    : var(--content-light);
-    border-radius : var(--rounded-full);
+    position : relative;
 
-    .progress-value {
-        height        : 100%;
-        width         : 0;
-        background    : var(--primary);
+    .progress-bar { 
+        position      : relative;
+        height        : 6px;
+        width         : 300px;
+        padding       : 0 5px;
+        margin-top    : 15px;
+        background    : var(--content-light);
         border-radius : var(--rounded-full);
-        transition    : .2s;
+
+        .progress-value {
+            height        : 100%;
+            width         : 0;
+            background    : var(--primary);
+            border-radius : var(--rounded-full);
+            transition    : .2s;
+        }
     }
 
     .percentage {

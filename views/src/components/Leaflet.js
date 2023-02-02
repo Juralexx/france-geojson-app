@@ -3,17 +3,22 @@ import styled from 'styled-components';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import { LeafletContext, SearchContext, SelectionContext } from '../AppContext';
-import { getArborescence, getGeoJSONBounds, getZoom } from './functions/functions'
-import { departements_regions, departments, old_regions, regions } from './functions/api'
-import { doesStringIncludes } from './Utils'
 import { ThemeContext } from './theme/ThemeContextWrapper';
+import { departements_regions, departments, old_regions, regions } from './functions/api'
+import { getArborescence, getGeoJSONBounds, getZoom } from './functions/functions'
+import { doesStringIncludes } from './Utils'
 
 const Leaflet = () => {
-    const defaultCenter = [47.29580115135585, -0.034327425932688935]
     const { selected, setSelected, arborescence, setArborescence, hovered, setHovered } = React.useContext(SelectionContext)
-    const { geojsons, geoJSON, setGeoJSON, leaflet, setLeaflet } = React.useContext(LeafletContext)
+    const { geojsons, geoJSON, setGeoJSON, leaflet, setLeaflet, sm } = React.useContext(LeafletContext)
     const { fetchLocation } = React.useContext(SearchContext)
     const { theme } = React.useContext(ThemeContext)
+
+    const defaultCenter = !sm ? [47.29580115135585, -0.034327425932688935] : [48.63777697920443, 2.409166367582529]
+
+    /**
+     * 
+     */
 
     const fetchGeoJSON = (propertyName) => {
         if (regions.includes(propertyName)) {
@@ -59,10 +64,10 @@ const Leaflet = () => {
                     if (!doesStringIncludes(previous, ['France', 'Régions', 'Anciennes régions', 'Départements'])) {
                         const geojsonBounds = getGeoJSONBounds(geoJSON)
                         map.flyToBounds([
-                            [geojsonBounds[3], geojsonBounds[2]],
-                            [geojsonBounds[1], geojsonBounds[0]]
+                            [geojsonBounds[1], geojsonBounds[0]],
+                            [geojsonBounds[3], geojsonBounds[2]]
                         ])
-                    } else map.flyTo(defaultCenter, 6)
+                    } else map.flyTo(defaultCenter, !sm ? 6 : 5)
 
                     if (regions.includes(previous)) {
                         setArborescence(getArborescence('Régions', previous, geojsons))
@@ -84,8 +89,8 @@ const Leaflet = () => {
             if (leaflet.zoomAction === 'zoomIn') {
                 const geojsonBounds = getGeoJSONBounds(geoJSON)
                 map.flyToBounds([
-                    [geojsonBounds[3], geojsonBounds[2]],
-                    [geojsonBounds[1], geojsonBounds[0]]
+                    [geojsonBounds[1], geojsonBounds[0]],
+                    [geojsonBounds[3], geojsonBounds[2]]
                 ])
                 setLeaflet(prev => ({ ...prev, zoomAction: '' }))
             }
@@ -93,8 +98,8 @@ const Leaflet = () => {
             if (selected.name === 'Commune') {
                 const geojsonBounds = getGeoJSONBounds(geoJSON)
                 map.flyToBounds([
-                    [geojsonBounds[3], geojsonBounds[2]],
-                    [geojsonBounds[1], geojsonBounds[0]]
+                    [geojsonBounds[1], geojsonBounds[0]],
+                    [geojsonBounds[3], geojsonBounds[2]]
                 ])
             }
         }, [])
@@ -195,17 +200,18 @@ const Leaflet = () => {
                 key={null}
                 center={defaultCenter}
                 zoom={leaflet.zoom}
-                minZoom={6}
-                boundsOptions={{
-                    paddingTopLeft: [500, 0],
-                    paddingBottomRight: [500, 0],
-                }}
-                style={{ width: '100vw', height: '100vh' }}
+                minZoom={5}
+                style={{ width: '100%', height: '100%' }}
+                // boundsOptions={{ paddingTopLeft: [500, 0], paddingBottomRight: [500, 0] }}
+                boundsOptions={{ padding: [100, 150] }}
             >
                 <TileLayer
                     attribution='<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    // url={'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}
-                    url={theme.theme && theme.theme === 'dark' ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png' : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}
+                    url={theme.theme && theme.theme === 'dark' ? (
+                        'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+                    ) : (
+                        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                    )}
                 />
                 {Object.keys(geoJSON).length > 0 &&
                     <ReturnGeoJSON />
@@ -225,6 +231,11 @@ const LeafletContainer = styled.div`
     position : relative;
     width    : 100vw;
     height   : 100vh;
+
+    @media(max-width: 768px) {
+        flex-grow : 1;
+        height    : 100%;
+    }
 
     .leaflet-tile-pane {
         -webkit-filter : grayscale(100%);

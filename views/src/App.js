@@ -13,8 +13,10 @@ import ThemeToggle from "./components/theme/ThemeToggle";
 import { LeafletContext, SearchContext, SelectionContext } from "./AppContext";
 import { getArborescence } from "./components/functions/functions";
 import { doesAllArraysInElementContainValues } from "./components/Utils";
+import useMediaQuery from "./components/functions/hooks/useMediaQuery";
 
 function App() {
+    const sm = useMediaQuery('(max-width: 768px)')
     // All geojsons datas
     const [geojsons, setGeojsons] = React.useState({})
     // Leaflet geojson object
@@ -43,23 +45,13 @@ function App() {
     // France - 0 , Régions - 1, Anciennes Régions - 1, Départements - 2, Arrodissements - 3, Canton - 4, Communes - 4, Commune - 4
     const [selected, setSelected] = React.useState({ level: 0, name: 'Régions' })
     // Leaflet properties
-    const [leaflet, setLeaflet] = React.useState({ zoomAction: '', zoom: 6 })
+    const [leaflet, setLeaflet] = React.useState({ zoomAction: '', zoom: !sm ? 6 : 5 })
     // Arborescence card
     const [arborescence, setArborescence] = React.useState([])
     // Search object
     const [search, setSearch] = React.useState({ state: false, query: '', results: [], isLoading: false, locationSelected: {} })
     // Display location informations on geojson element hover
-    const [hovered, setHovered] = React.useState({
-        active: false,
-        element: {
-            type: '',
-            region: '',
-            departement: '',
-            arrondissement: '',
-            canton: '',
-            commune: ''
-        }
-    })
+    const [hovered, setHovered] = React.useState({ active: false, element: { type: '', region: '', departement: '', arrondissement: '', canton: '', commune: '' } })
 
     // Open sidebar
     const [open, setOpen] = React.useState(false)
@@ -83,7 +75,7 @@ function App() {
                     setSearch(data => ({ ...data, locationSelected: Object.assign(res[0].fields, { ...res[1].features[0].properties }) }))
                     setGeoJSON(res[2])
                     setArborescence(getArborescence('Départements', res[0].fields.dep_nom, geojsons))
-                    setLeaflet(prev => ({ ...prev, zoomAction: 'zoomIn' }))
+                    setSelected({ level: 2, name: 'Commune' })
                 } else return
             })
         } catch (err) {
@@ -91,16 +83,12 @@ function App() {
         }
     }
 
-    /**
-     * 
-     */
-
     return (
         <RootContainer>
             <GlobalStyles />
             {Object.keys(geojsons).length > 0 ? (
                 <LeafletContext.Provider
-                    value={{ geojsons, geoJSON, setGeoJSON, leaflet, setLeaflet }}
+                    value={{ geojsons, geoJSON, setGeoJSON, leaflet, setLeaflet, sm }}
                 >
                     <SelectionContext.Provider
                         value={{ selected, setSelected, arborescence, setArborescence, hovered, setHovered }}
@@ -108,11 +96,11 @@ function App() {
                         <SearchContext.Provider
                             value={{ search, setSearch, fetchLocation, open, setOpen }}
                         >
-                            <Leaflet />
                             <SearchContainer>
                                 <SearchCard />
                                 <Arborescence />
                             </SearchContainer>
+                            <Leaflet />
                         </SearchContext.Provider>
                         <France />
                         <Logo />
@@ -136,9 +124,15 @@ export default App;
 
 const RootContainer = styled.div`
     position   : relative;
-    min-height : 100vh;
+    height     : 100vh;
     width      : 100vw;
     background : var(--content);
+    /* overflow   : hidden; */
+
+    @media(max-width: 768px) {
+        display        : flex;
+        flex-direction : column;
+    }
 
     .circle-loader {
         .path {
@@ -151,7 +145,15 @@ const SearchContainer = styled.div`
     position  : absolute;
     top       : 20px;
     left      : 20px;
-    width     : 30%;
-    min-width : 300px;
+    width     : 350px;
     max-width : 350px;
+    z-index   : 1000;
+
+    @media(max-width: 768px) {
+        position  : relative;
+        top       : 0;
+        left      : 0;
+        width     : 100vw;
+        max-width : 100vw;
+    }
 `

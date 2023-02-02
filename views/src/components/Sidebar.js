@@ -55,7 +55,7 @@ const SideMenu = styled.div`
         bottom     : 0;
         top        : 0;
         height     : 100vh;
-        width      : 40%;
+        width      : 100%;
         max-width  : 500px;
         padding    : 25px;
         background : var(--content);
