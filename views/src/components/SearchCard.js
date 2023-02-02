@@ -18,43 +18,37 @@ const SearchCard = () => {
      * 
      */
 
-    const searchLocation = async () => {
-        if (!search.query || search.query.trim() === "") return
-        if (search.query.length >= 2) {
+    const searchLocation = async (value) => {
+        if (!value || value.trim() === "") return
+        if (value.length >= 2) {
             setSearch(data => ({ ...data, state: true, isLoading: true }))
 
             const paths = [
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/locations/find/${search.query}`,
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/departments/find/${search.query}`,
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/regions/find/${search.query}`,
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/regions/new/find/${search.query}`
+                `${process.env.REACT_APP_API_LOCATIONS_URL}api/locations/find/${value}`,
+                `${process.env.REACT_APP_API_LOCATIONS_URL}api/departments/find/${value}`,
+                `${process.env.REACT_APP_API_LOCATIONS_URL}api/regions/find/${value}`,
+                `${process.env.REACT_APP_API_LOCATIONS_URL}api/regions/new/find/${value}`
             ]
 
             const response = paths.map(async (path, i) => {
                 return await axios
                     .get(encodeURI(path))
                     .then(res => {
-                        if (i === 0)
-                            return res.data.map(el => Object.assign(el, { type: 'commune' }))
-                        else if (i === 1)
-                            return res.data.map(el => Object.assign(el, { type: 'département' }))
-                        else if (i === 2)
-                            return res.data.map(el => Object.assign(el, { type: 'région' }))
-                        else if (i === 3)
-                            return res.data.map(el => Object.assign(el, { type: 'région' }))
+                        switch (i) {
+                            case 0: return res.data.map(el => Object.assign(el, { type: 'commune' }))
+                            case 1: return res.data.map(el => Object.assign(el, { type: 'département' }))
+                            case 2: return res.data.map(el => Object.assign(el, { type: 'région' }))
+                            case 3: return res.data.map(el => Object.assign(el, { type: 'région' }))
+                        }
                     })
                     .catch(err => console.error(err))
             })
             Promise.all(response).then(res => {
-                if (doesAtLeastOneArrayInElementContainValues(res)) {
+                if (doesAtLeastOneArrayInElementContainValues(res))
                     setSearch(data => ({ ...data, results: Array.prototype.concat(...res) }))
-                } else {
-                    setSearch(data => ({ ...data, results: [], isLoading: false }))
-                }
+                else setSearch(data => ({ ...data, results: [], isLoading: false }))
             })
-        } else {
-            setSearch(data => ({ ...data, state: false, results: [], isLoading: false }))
-        }
+        } else setSearch(data => ({ ...data, state: false, results: [], isLoading: false }))
     }
 
     /**
@@ -95,7 +89,7 @@ const SearchCard = () => {
                     placeholder="Effectuer une recherche..."
                     value={search.query}
                     onInput={e => setSearch(data => ({ ...data, query: e.target.value }))}
-                    onChange={searchLocation}
+                    onChange={e => searchLocation(e.target.value)}
                 />
                 {search.query.length > 0 ? (
                     <Icon name="Cross" className="search-svg" onClick={() => setSearch(data => ({ ...data, state: false, query: '' }))} />
@@ -172,6 +166,18 @@ const SearchInput = styled.div`
 
         &.search-svg {
             border-left  : 1px solid var(--light-border);
+        }
+    }
+
+    @media(max-width: 768px) {
+        padding       : 0 5px;
+        border-radius : 0;
+        width         : calc(100vw - 80px);
+        box-shadow    : none;
+
+        input {
+            width     : calc(100vw - 165px);
+            font-size : 14px;
         }
     }
 `
