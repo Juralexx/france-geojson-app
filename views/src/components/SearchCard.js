@@ -24,10 +24,10 @@ const SearchCard = () => {
             setSearch(data => ({ ...data, state: true, isLoading: true }))
 
             const paths = [
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/locations/find/${value}`,
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/departments/find/${value}`,
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/regions/find/${value}`,
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/regions/new/find/${value}`
+                `${process.env.REACT_APP_API_LOCATIONS_URL}search/locations/find/${value}`,
+                `${process.env.REACT_APP_API_LOCATIONS_URL}search/departments/find/${value}`,
+                `${process.env.REACT_APP_API_LOCATIONS_URL}search/regions/find/${value}`,
+                `${process.env.REACT_APP_API_LOCATIONS_URL}search/new-regions/find/${value}`
             ]
 
             const response = paths.map(async (path, i) => {
