@@ -17,14 +17,8 @@ const Sidebar = ({ open, setOpen }) => {
                 </div>
                 <div className="side-body">
                     <p>
-                        Le projet Github france-geojson propose au format GeoJSON les cartes des régions, départements,
-                        arrondissements, cantons et communes de France (métropole et départements d'outre-mer) à partir
-                        des données publiées par l'IGN et l'INSEE.
-                    </p>
-                    <p>
-                        Ce site permet de rechercher, visualiser et télécharger individuellement chacun de ces fichiers
-                        dans un format optimisé. Pour plus de détails ou pour accèder à la version non optimisée des tracés,
-                        cliquez sur le bouton ci-dessous.
+                        Ce site permet de rechercher et visualiser les cartes des régions, départements, arrondissements, cantons et 
+                        communes de France (métropole et départements d'outre-mer) à partir des données publiées par<br />l'IGN et l'INSEE.
                     </p>
                 </div>
                 <p>Développé par <a href={`${process.env.REACT_APP_BASE_URL}`} target="_blank" rel="noreferrer">Alexandre Vurbier <Icon name="External" /></a></p>
@@ -48,6 +42,7 @@ const SideMenu = styled.div`
     visibility      : hidden;
     opacity         : 0;
     transition      : .3s ease;
+    z-index         : 1500;
 
     .side {
         position   : fixed;
