@@ -2,7 +2,7 @@ import React from 'react'
 
 const TextHeight = (props) => {
     return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+        <svg {...props} xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
             <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                 <rect x="0" y="0" width="24" height="24" />
                 <path d="M8.5,8 L8.5,18 C8.5,18.5522847 8.05228475,19 7.5,19 L6.5,19 C5.94771525,19 5.5,18.5522847 5.5,18 L5.5,8 L2,8 C1.44771525,8 1,7.55228475 1,7 L1,6 C1,5.44771525 1.44771525,5 2,5 L12,5 C12.5522847,5 13,5.44771525 13,6 L13,7 C13,7.55228475 12.5522847,8 12,8 L8.5,8 Z" fill="currentColor" opacity="0.3" />

@@ -2,7 +2,7 @@ import React from 'react'
 
 const MoonFog = (props) => {
     return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+        <svg {...props} xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
             <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                 <polygon points="0 0 24 0 24 24 0 24" />
                 <path d="M12.880982,3.00020666 C12.4130881,3.80913672 12.1452994,4.74829566 12.1452994,5.75 C12.1452994,8.77148908 14.5817362,11.2239178 17.5971169,11.2497933 C16.6461704,12.8938611 14.8686612,14 12.8327994,14 C9.7952333,14 7.33279942,11.5375661 7.33279942,8.5 C7.33279942,5.46243388 9.7952333,3 12.8327994,3 C12.8488765,3 12.8649374,3.00006898 12.880982,3.00020666 Z" fill="currentColor" />

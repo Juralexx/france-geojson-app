@@ -2,7 +2,7 @@ import React from 'react'
 
 const Mute = (props) => {
     return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+        <svg {...props} xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
             <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                 <rect x="0" y="0" width="24" height="24" />
                 <path d="M18,11 L18,9 C18,8.44771525 18.4477153,8 19,8 C19.5522847,8 20,8.44771525 20,9 L20,11 L22,11 C22.5522847,11 23,11.4477153 23,12 C23,12.5522847 22.5522847,13 22,13 L20,13 L20,15 C20,15.5522847 19.5522847,16 19,16 C18.4477153,16 18,15.5522847 18,15 L18,13 L16,13 C15.4477153,13 15,12.5522847 15,12 C15,11.4477153 15.4477153,11 16,11 L18,11 Z" fill="currentColor" opacity="0.3" transform="translate(19.000000, 12.000000) rotate(-45.000000) translate(-19.000000, -12.000000) " />

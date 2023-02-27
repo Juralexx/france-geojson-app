@@ -2,7 +2,7 @@ import React from 'react'
 
 const Wind = (props) => {
     return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+        <svg {...props} xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
             <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                 <polygon points="0 0 24 0 24 24 0 24" />
                 <path d="M3,13 L3,11 L17.5,11 C18.3284271,11 19,10.3284271 19,9.5 L19,9 C19,8.44771525 18.5522847,8 18,8 C17.4477153,8 17,8.44771525 17,9 L17,10 L15,10 L15,9 C15,7.34314575 16.3431458,6 18,6 C19.6568542,6 21,7.34314575 21,9 L21,9.5 C21,11.4329966 19.4329966,13 17.5,13 L3,13 Z" fill="currentColor" fillRule="nonzero" />

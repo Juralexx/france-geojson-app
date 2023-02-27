@@ -2,7 +2,7 @@ import React from 'react'
 
 const Cloudy = (props) => {
     return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+        <svg {...props} xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
             <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                 <polygon points="0 0 24 0 24 24 0 24" />
                 <path d="M7.74714567,15.0425758 C6.09410362,13.9740356 5,12.1147886 5,10 C5,6.6862915 7.6862915,4 11,4 C13.7957591,4 16.1449096,5.91215918 16.8109738,8.5 L19.25,8.5 C21.3210678,8.5 23,10.1789322 23,12.25 C23,14.3210678 21.3210678,16 19.25,16 L10.25,16 C9.28817895,16 8.41093178,15.6378962 7.74714567,15.0425758 Z" fill="currentColor" opacity="0.3" />

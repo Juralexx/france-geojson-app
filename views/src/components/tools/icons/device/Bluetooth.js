@@ -2,7 +2,7 @@ import React from 'react'
 
 const Bluetooth = (props) => {
     return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+        <svg {...props} xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
             <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                 <rect x="0" y="0" width="24" height="24" />
                 <path d="M12,13.8453624 L12,18.758963 L15.3125397,16.8266482 L12,13.8453624 Z M10,12.0453624 L6.33103527,8.74329415 C5.92052525,8.37383513 5.88724683,7.74154529 6.25670585,7.33103527 C6.62616487,6.92052525 7.25845471,6.88724683 7.66896473,7.25670585 L17.6689647,16.2567059 C18.172608,16.7099848 18.0891527,17.5223646 17.503871,17.8637789 L11.503871,21.3637789 C10.8372144,21.7526619 10,21.2717908 10,20.5 L10,12.0453624 Z" fill="currentColor" fillRule="nonzero" opacity="0.3" />

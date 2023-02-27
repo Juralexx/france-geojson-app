@@ -2,7 +2,7 @@ import React from 'react'
 
 const Rainbow = (props) => {
     return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+        <svg {...props} xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
             <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
                 <polygon points="0 0 24 0 24 24 0 24" />
                 <path d="M5.07063123,16 C5.55875184,12.5781289 8.50474349,10 12,10 C15.4955057,10 18.4413027,12.5784053 18.9293689,16 L16.8999819,16 C16.4367116,13.7177597 14.4189579,12 12,12 C9.58104209,12 7.56328845,13.7177597 7.10001812,16 L5.07063123,16 Z M9.16995766,16 C9.58346456,14.8278115 10.7038257,14 12,14 C13.2962528,14 14.4165517,14.8278812 14.8300407,16 L9.16995766,16 Z" fill="currentColor" opacity="0.3" />
