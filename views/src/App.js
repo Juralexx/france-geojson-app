@@ -60,9 +60,9 @@ function App() {
     const fetchLocation = async (location) => {
         try {
             const paths = [
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/locations/${location}`,
+                `${process.env.REACT_APP_API_LOCATIONS_URL}search/locations/${location}`,
                 `${process.env.REACT_APP_API_GOUV_URL}?q=${location}&limit=1`,
-                `${process.env.REACT_APP_API_LOCATIONS_URL}api/locations/geolocation/${location}`
+                `${process.env.REACT_APP_API_LOCATIONS_URL}search/locations/geolocation/${location}`
             ]
             const response = paths.map(async path => {
                 return await axios
