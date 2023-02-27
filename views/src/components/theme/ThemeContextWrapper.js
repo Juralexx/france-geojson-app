@@ -5,7 +5,6 @@ export const ThemeContext = createContext()
 
 export default function ThemeContextWrapper(props) {
     const themeStorage = localStorage.getItem("theme")
-    const preference = JSON.parse(themeStorage).preference
 
     const [theme, setTheme] = React.useState({ preference: null, theme: null })
 
@@ -16,6 +15,7 @@ export default function ThemeContextWrapper(props) {
     function checkTheme() {
         if (theme.preference === null) {
             if (themeStorage !== null) {
+                const preference = JSON.parse(themeStorage).preference
                 if (preference === "light") {
                     replaceBodyClass('light', 'dark')
                     setTheme({ preference: 'light', theme: 'light' })
