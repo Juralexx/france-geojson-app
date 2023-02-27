@@ -9,7 +9,7 @@ const Head = ({ title, description, image }) => {
         site_name: 'France GeoJSON',
         title: 'France GeoJSON - Cartes des régions, départements, arrondissements, cantons et communes de France au format GeoJSON' || title,
         description: 'Cartes des régions, départements, arrondissements, cantons et communes de France au format GeoJSON' || description,
-        image: `${process.env.REACT_APP_SERVER_URL}/files/img/logo.png` || image,
+        image: `${process.env.REACT_APP_SERVER_URL}/files/img/france-geojson.jpg` || image,
         url: `${process.env.REACT_APP_URL}${pathname}`
     }
 
