@@ -829,6 +829,21 @@ export const isEmpty = (value) => {
 }
 
 /**
+ * Add `highlight` class to strings parts matching the mentioned query
+ * @param {*} query Query to match
+ * @param {*} classname Class name of the elements to highlight
+ */
+
+export const highlightSearchResults = (query, classname) => {
+    let results = document.querySelectorAll(classname);
+    let regex = new RegExp(query, 'i');
+
+    for (let i = 0; i < results.length; i++) {
+        results[i].innerHTML = results[i].innerText.replace(regex, (match) => `<span class="highlight">${match}</span>`);
+    }
+}
+
+/**
  * Add full size background image
  * @param {*} img Image to add
  */
@@ -914,7 +929,6 @@ export const returnURLsInText = (text) => {
     let arr = []
     while (regexp.test(txt)) {
         let matched = regexp.exec(txt)[0]
-        console.log(matched)
         arr.push(matched)
         txt = txt.replace(matched, '')
     }

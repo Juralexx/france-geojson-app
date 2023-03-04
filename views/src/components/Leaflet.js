@@ -1,20 +1,25 @@
 import React from 'react'
 import styled from 'styled-components';
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css';
 import { LeafletContext, SearchContext, SelectionContext } from '../AppContext';
 import { ThemeContext } from './theme/ThemeContextWrapper';
 import { departements_regions, departments, old_regions, regions } from './functions/api'
-import { getArborescence, getGeoJSONBounds, getZoom } from './functions/functions'
+import { getArborescence, getGeoJSONBounds } from './functions/functions'
 import { doesStringIncludes } from './Utils'
+import TopoJSON from './TopoJSON'
+import useMediaQuery from "./functions/hooks/useMediaQuery";
 
 const Leaflet = () => {
+    const sm = useMediaQuery('(max-width: 768px)')
     const { selected, setSelected, arborescence, setArborescence, hovered, setHovered } = React.useContext(SelectionContext)
-    const { geojsons, geoJSON, setGeoJSON, leaflet, setLeaflet, sm } = React.useContext(LeafletContext)
+    const { geojsons, geoJSON, setGeoJSON, zoomAction, setZoomAction } = React.useContext(LeafletContext)
     const { fetchLocation } = React.useContext(SearchContext)
     const { theme } = React.useContext(ThemeContext)
 
     const defaultCenter = !sm ? [47.29580115135585, -0.034327425932688935] : [48.63777697920443, 2.409166367582529]
+
+    const [bounds, setBounds] = React.useState(getGeoJSONBounds(geoJSON))
 
     /**
      * 
@@ -47,17 +52,16 @@ const Leaflet = () => {
 
             if (regions.includes(nom) || old_regions.includes(nom)) {
                 setSelected(prev => ({ ...prev, level: 1, name: 'Région' }))
-                map.flyToBounds(event.target.getBounds(), { paddingTopLeft: [200, 0] });
             } else if (departments.includes(nom)) {
                 setSelected(prev => ({ ...prev, level: 2, name: 'Département' }))
-                map.flyToBounds(event.target.getBounds(), { paddingTopLeft: [200, 0] });
-            } else {
-                map.flyTo(defaultCenter, 6)
             }
+            setBounds(event.target.getBounds())
+            map.flyToBounds(event.target.getBounds())
+            // map.flyTo(defaultCenter, 6)
         }
 
         React.useEffect(() => {
-            if (leaflet.zoomAction === 'zoomOut') {
+            if (zoomAction === 'zoomOut') {
                 if (arborescence.length > 0) {
                     let previous = arborescence[0].previous
 
@@ -83,16 +87,7 @@ const Leaflet = () => {
                         setArborescence([])
                     }
                 }
-                setLeaflet(prev => ({ ...prev, zoomAction: '' }))
-            }
-
-            if (leaflet.zoomAction === 'zoomIn') {
-                const geojsonBounds = getGeoJSONBounds(geoJSON)
-                map.flyToBounds([
-                    [geojsonBounds[1], geojsonBounds[0]],
-                    [geojsonBounds[3], geojsonBounds[2]]
-                ])
-                setLeaflet(prev => ({ ...prev, zoomAction: '' }))
+                setZoomAction('')
             }
 
             if (selected.name === 'Commune') {
@@ -105,14 +100,13 @@ const Leaflet = () => {
         }, [])
 
         return (
-            <GeoJSON
+            <TopoJSON
                 data={geoJSON}
                 onEachFeature={(__, layer) => {
                     layer.on({
                         click: event => {
                             let nom = layer.feature.properties.nom
                             if (regions.includes(nom) || old_regions.includes(nom) || departments.includes(nom)) {
-                                setLeaflet({ zoomAction: 'zoomIn', zoom: getZoom(selected.level) })
                                 zoomToFeature(event, layer)
                                 fetchGeoJSON(nom)
                             } else if (selected.name === 'Communes') {
@@ -197,12 +191,13 @@ const Leaflet = () => {
     return (
         <LeafletContainer>
             <MapContainer
+            
                 key={null}
                 center={defaultCenter}
-                zoom={leaflet.zoom}
+                zoom={!sm ? 6 : 5}
                 minZoom={5}
                 style={{ width: '100%', height: '100%' }}
-                // boundsOptions={{ paddingTopLeft: [500, 0], paddingBottomRight: [500, 0] }}
+                bounds={bounds}
                 boundsOptions={{ padding: [100, 150] }}
             >
                 <TileLayer
@@ -221,7 +216,7 @@ const Leaflet = () => {
     )
 }
 
-export default Leaflet
+export default React.memo(Leaflet)
 
 /**
  * 

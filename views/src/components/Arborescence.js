@@ -2,14 +2,13 @@ import React from 'react'
 import styled from 'styled-components'
 import Icon from './tools/icons/Icon'
 import SemiCicle from './loader/SemiCicle'
-import { LeafletContext, SearchContext, SelectionContext } from '../AppContext'
+import { LeafletContext, SelectionContext } from '../AppContext'
 import { addActive } from './Utils'
-import { getLevel, getZoom } from './functions/functions'
+import { getLevel } from './functions/functions'
 
-const Arborescence = () => {
+const Arborescence = ({ search }) => {
     const { selected, setSelected, arborescence, hovered } = React.useContext(SelectionContext)
-    const { search } = React.useContext(SearchContext)
-    const { geojsons, setGeoJSON, setLeaflet, sm } = React.useContext(LeafletContext)
+    const { geojsons, setGeoJSON, fitLayerBounds, sm } = React.useContext(LeafletContext)
     const [isLoading, setLoading] = React.useState(false)
 
     const tabs = ['France', 'Régions', 'Anciennes régions', 'Départements']
@@ -22,7 +21,7 @@ const Arborescence = () => {
     }, [isLoading])
 
     return (
-        <>
+        <React.Fragment>
             {!search.state && (
                 selected.level === 0 ? (
                     <SelectionList>
@@ -35,7 +34,6 @@ const Arborescence = () => {
                                         setGeoJSON(geojsons[tab])
                                         setSelected(prev => ({ ...prev, level: 0, name: tab }))
                                         setLoading(true)
-                                        setLeaflet({ zoomAction: 'zoomOut', zoom: 6 })
                                     }}
                                 >
                                     {selected.name === tab ? (
@@ -49,49 +47,50 @@ const Arborescence = () => {
                         })}
                     </SelectionList>
                 ) : (
-                    [...new Array(6)].map((_, key) => {
-                        return (
-                            selected.level === key && (
-                                <SelectionList key={key}>
-                                    <div className='previous' onClick={() => {
-                                        setGeoJSON(arborescence[0].value)
-                                        setLeaflet({ zoomAction: 'zoomOut', zoom: getZoom(arborescence[0].previous) })
-                                        setSelected(prev => ({ ...prev, level: getLevel(arborescence[0].previous), name: arborescence[0].previous }))
-                                    }}>
-                                        <Icon name="DoubleArrowLeft" />
-                                        {arborescence[0].previous}
-                                    </div>
-                                    <h2>{arborescence[1].name}</h2>
-                                    {arborescence.slice(2).map((tab, i) => {
-                                        return (
-                                            <SelectionListItem key={i}
-                                                className={addActive(selected.name === tab.name)}
-                                                onClick={() => {
-                                                    if (selected.name === 'Commune') {
-                                                        setLeaflet(prev => ({ ...prev, zoomAction: 'zoomOut' }))
-                                                    }
-                                                    setGeoJSON(tab.value)
-                                                    setSelected(prev => ({ ...prev, level: getLevel(tab.name), name: tab.name }))
-                                                    setLoading(true)
-                                                }}
-                                            >
-                                                {selected.name === tab.name ? (
-                                                    isLoading ? <SemiCicle /> : <Icon name="Spinner" className="icon" />
-                                                ) : (
-                                                    <Icon name="Point" className="icon" />
-                                                )}
-                                                {tab.name}
-                                            </SelectionListItem>
-                                        )
-                                    })}
-                                </SelectionList>
+                    arborescence?.length > 0 && (
+                        [...new Array(6)].map((_, key) => {
+                            return (
+                                selected.level === key && (
+                                    <SelectionList key={key}>
+                                        <div className='previous' onClick={() => {
+                                            setGeoJSON(arborescence[0]?.value)
+                                            setSelected(prev => ({ ...prev, level: getLevel(arborescence[0]?.previous), name: arborescence[0]?.previous }))
+                                            fitLayerBounds(arborescence[0]?.value)
+                                        }}>
+                                            <Icon name="DoubleArrowLeft" />
+                                            {arborescence[0]?.previous}
+                                        </div>
+                                        <h2>{arborescence[1]?.name}</h2>
+                                        {arborescence?.slice(2).map((tab, i) => {
+                                            return (
+                                                <SelectionListItem key={i}
+                                                    className={addActive(selected.name === tab.name)}
+                                                    onClick={() => {
+                                                        setGeoJSON(tab.value)
+                                                        setSelected(prev => ({ ...prev, level: getLevel(tab.name), name: tab.name }))
+                                                        setLoading(true)
+                                                        if (selected.name === 'Commune') {
+                                                            fitLayerBounds(tab.value, true)
+                                                        }
+                                                    }}
+                                                >
+                                                    {selected.name === tab.name ? (
+                                                        isLoading ? <SemiCicle /> : <Icon name="Spinner" className="icon" />
+                                                    ) : (
+                                                        <Icon name="Point" className="icon" />
+                                                    )}
+                                                    {tab.name}
+                                                </SelectionListItem>
+                                            )
+                                        })}
+                                    </SelectionList>
+                                )
                             )
-                        )
-                    })
+                        })
+                    )
                 )
             )}
-            {
-                hovered.active &&
+            {hovered.active && !sm &&
                 selected.name !== 'Commune' && (
                     <Tooltip>
                         <h5>Informations</h5>
@@ -113,26 +112,25 @@ const Arborescence = () => {
                     </Tooltip>
                 )
             }
-            {selected.name === 'Commune' &&
-                Object.keys(search.locationSelected).length > 0 && (
+            {selected.name === 'Commune' && !sm &&
+                Object.keys(selected?.selectedCommune).length > 0 && (
                     <SelectionList>
                         <div className='previous' onClick={() => {
                             setGeoJSON(arborescence[0].value)
-                            setLeaflet({ zoomAction: 'zoomOut', zoom: getZoom(arborescence[0].previous) })
-                            setSelected(prev => ({ ...prev, level: getLevel(arborescence[0].previous), name: arborescence[0].previous }))
-                        }}></div>
-                        <h3>{search.locationSelected.com_nom}</h3>
-                        <p><b>Commune :</b> {search.locationSelected.city}</p>
-                        <p><b>Municipalité :</b> {search.locationSelected.municipality}</p>
-                        <p><b>Population :</b> {search.locationSelected.population}</p>
-                        <p><b>Région :</b> {search.locationSelected?.reg_nom}</p>
-                        <p><b>Ancienne région :</b> {search.locationSelected?.reg_nom_old}</p>
-                        <p><b>Département :</b> {search.locationSelected?.dep_nom}</p>
-                        <p><b>Code département :</b> {search.locationSelected?.dep_code}</p>
+                            setSelected(prev => ({ ...prev, level: getLevel(arborescence[0]?.previous), name: arborescence[0]?.previous }))
+                        }} />
+                        <h3>{selected.selectedCommune.com_nom}</h3>
+                        <p><b>Commune :</b> {selected.selectedCommune.city}</p>
+                        <p><b>Municipalité :</b> {selected.selectedCommune.municipality}</p>
+                        <p><b>Population :</b> {selected.selectedCommune.population}</p>
+                        <p><b>Région :</b> {selected.selectedCommune?.reg_nom}</p>
+                        <p><b>Ancienne région :</b> {selected.selectedCommune?.reg_nom_old}</p>
+                        <p><b>Département :</b> {selected.selectedCommune?.dep_nom}</p>
+                        <p><b>Code département :</b> {selected.selectedCommune?.dep_code}</p>
                     </SelectionList>
                 )
             }
-        </>
+        </React.Fragment>
     )
 }
 

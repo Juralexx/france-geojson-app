@@ -9,7 +9,7 @@ const Head = ({ title, description, image }) => {
         site_name: 'France GeoJSON',
         title: 'France GeoJSON - Cartes des régions, départements, arrondissements, cantons et communes de France au format GeoJSON' || title,
         description: 'Cartes des régions, départements, arrondissements, cantons et communes de France au format GeoJSON' || description,
-        image: `${process.env.REACT_APP_SERVER_URL}/files/img/france-geojson.jpg` || image,
+        image: `${process.env.REACT_APP_URL}/img/france-geojson.jpg` || image,
         url: `${process.env.REACT_APP_URL}${pathname}`
     }
 
@@ -32,7 +32,11 @@ const Head = ({ title, description, image }) => {
             <meta name="twitter:image" content={metadatas.image} />
             <meta name="twitter:site" content={metadatas.site_name} />
 
-            <meta name="google-site-verification" content="DCl7VAf9tcz6eD9gb67NfkNnJ1PKRNcg8qQiwpbx9Lk" />
+            {/* <meta http-equiv="Content-Security-Policy"
+                content="default-src *; img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src  'self' 'unsafe-inline' *"
+            /> */}
+
+            {/* <meta name="google-site-verification" content="DCl7VAf9tcz6eD9gb67NfkNnJ1PKRNcg8qQiwpbx9Lk" /> */}
         </Helmet>
     )
 }

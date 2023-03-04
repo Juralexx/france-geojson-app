@@ -2,23 +2,24 @@ import React from 'react'
 import axios from 'axios'
 import styled from 'styled-components'
 import { LeafletContext, SearchContext, SelectionContext } from '../AppContext'
+import Arborescence from './Arborescence'
 import Icon from './tools/icons/Icon'
 import { ClassicInput } from './tools/Input'
 import SemiCicle from './loader/SemiCicle'
-import { doesAtLeastOneArrayInElementContainValues } from './Utils'
-import { getArborescence } from './functions/functions'
+import { doesAtLeastOneArrayInElementContainValues, highlightSearchResults } from './Utils'
+import { getArborescence, getGeoJSONBounds } from './functions/functions'
+import { departments, old_regions, regions } from './functions/api'
 
 const SearchCard = () => {
-    const { search, setSearch, fetchLocation, open, setOpen } = React.useContext(SearchContext)
+    const { fetchLocation, open, setOpen } = React.useContext(SearchContext)
     const { setSelected, setArborescence } = React.useContext(SelectionContext)
-    const { geojsons, setGeoJSON, setLeaflet } = React.useContext(LeafletContext)
+    const { geojsons, setGeoJSON, map, sm } = React.useContext(LeafletContext)
     const inputRef = React.useRef()
-
-    /**
-     * 
-     */
+    
+    const [search, setSearch] = React.useState({ state: false, query: '', results: [], isLoading: false })
 
     const searchLocation = async (value) => {
+        setSearch(data => ({ ...data, query: value }))
         if (!value || value.trim() === "") return
         if (value.length >= 2) {
             setSearch(data => ({ ...data, state: true, isLoading: true }))
@@ -39,48 +40,48 @@ const SearchCard = () => {
                             case 1: return res.data.map(el => Object.assign(el, { type: 'département' }))
                             case 2: return res.data.map(el => Object.assign(el, { type: 'région' }))
                             case 3: return res.data.map(el => Object.assign(el, { type: 'région' }))
+                            default: return
                         }
                     })
                     .catch(err => console.error(err))
             })
             Promise.all(response).then(res => {
-                if (doesAtLeastOneArrayInElementContainValues(res))
+                if (doesAtLeastOneArrayInElementContainValues(res)) {
                     setSearch(data => ({ ...data, results: Array.prototype.concat(...res) }))
+                    const timer = setTimeout(() => highlightSearchResults(value, '.auto-complete-item span'), 200)
+                    return () => clearTimeout(timer)
+                }
                 else setSearch(data => ({ ...data, results: [], isLoading: false }))
             })
         } else setSearch(data => ({ ...data, state: false, results: [], isLoading: false }))
     }
 
-    /**
-     * 
-     */
-
     const fetchRegion = (region) => {
-        setGeoJSON(geojsons[region]['GeoJSON'])
-        setArborescence(getArborescence('Régions', region, geojsons))
-        setSelected({ level: 1, name: 'Région' })
-        setLeaflet(prev => ({ ...prev, zoomAction: 'zoomIn' }))
+        if (regions.includes(region)) {
+            setGeoJSON(geojsons[region]['GeoJSON'])
+            setSelected({ level: 1, name: 'Régions' })
+            setArborescence(getArborescence('Régions', region, geojsons))
+        }
+        else if (old_regions.includes(region)) {
+            setArborescence(getArborescence('Anciennes régions', region, geojsons))
+            setGeoJSON(geojsons[region]['GeoJSON'])
+            setSelected({ level: 1, name: 'Anciennes régions' })
+        }
+        else if (departments.includes(region)) {
+            setGeoJSON(geojsons[region]['GeoJSON'])
+            setSelected({ level: 2, name: 'Départements' })
+            setArborescence(getArborescence('Départements', region, geojsons))
+        }
         setSearch({ state: false, query: '', results: [], isLoading: false })
+        const geojsonBounds = getGeoJSONBounds(geojsons[region]['GeoJSON'])
+        map.flyToBounds([
+            [geojsonBounds[1], geojsonBounds[0]],
+            [geojsonBounds[3], geojsonBounds[2]]
+        ], { paddingTopLeft: sm ? [0, 200] : [0, 0] })
     }
-
-    /**
-     * 
-     */
-
-    const fetchDepartment = (department) => {
-        setGeoJSON(geojsons[department]['GeoJSON'])
-        setArborescence(getArborescence('Départements', department, geojsons))
-        setSelected({ level: 1, name: 'Département' })
-        setLeaflet(prev => ({ ...prev, zoomAction: 'zoomIn' }))
-        setSearch({ state: false, query: '', results: [], isLoading: false })
-    }
-
-    /**
-     * 
-     */
 
     return (
-        <>
+        <React.Fragment>
             <SearchInput>
                 <Icon name="Menu" className="menu-svg" onClick={() => setOpen(!open)} />
                 <ClassicInput
@@ -88,7 +89,6 @@ const SearchCard = () => {
                     type="text"
                     placeholder="Effectuer une recherche..."
                     value={search.query}
-                    onInput={e => setSearch(data => ({ ...data, query: e.target.value }))}
                     onChange={e => searchLocation(e.target.value)}
                 />
                 {search.query.length > 0 ? (
@@ -97,6 +97,8 @@ const SearchCard = () => {
                     <Icon name="Search" className="search-svg" onClick={() => inputRef.current.focus()} />
                 )}
             </SearchInput>
+
+            <Arborescence search={search} />
 
             {search.state &&
                 <AutoCompleteContainer
@@ -116,7 +118,7 @@ const SearchCard = () => {
                                         </div>
                                     }
                                     {element.type === 'département' &&
-                                        <div className="auto-complete-item" onClick={() => fetchDepartment(element.nom_departement)}>
+                                        <div className="auto-complete-item" onClick={() => fetchRegion(element.nom_departement)}>
                                             <span>{`${element.nom_departement} - ${element.code_departement}`}</span>
                                         </div>
                                     }
@@ -143,11 +145,11 @@ const SearchCard = () => {
                     }
                 </AutoCompleteContainer>
             }
-        </>
+        </React.Fragment>
     )
 }
 
-export default SearchCard
+export default React.memo(SearchCard)
 
 const SearchInput = styled.div`
     display          : flex;
@@ -208,7 +210,7 @@ const AutoCompleteContainer = styled.div`
             }
         }
 
-        span {
+        span:not(.highlight) {
             &:first-child {
                 font-size    : 14px;
                 font-weight  : 500;

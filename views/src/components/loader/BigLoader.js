@@ -6,13 +6,9 @@ const BigLoader = ({ requestProgress }) => {
     const [percentage, setPercentage] = React.useState(0)
 
     React.useEffect(() => {
-        if (percentage < 100)
-            if (!requestProgress) {
-                const timer = setTimeout(() => setPercentage(prev => prev + 1), 100)
-                return () => clearTimeout(timer)
-            } else setPercentage(100)
+        if (percentage <= 100)
+            setPercentage(requestProgress)
         // setPercentage(prev => prev + Math.fround(requestProgress * 100))
-        else setPercentage(100)
     }, [requestProgress, percentage])
 
     return (
@@ -28,7 +24,7 @@ const BigLoader = ({ requestProgress }) => {
                     <div className="progress-value" style={{ width: `${percentage}%` }}></div>
                 </div>
                 <div className="percentage">
-                    <div>Chargement...</div>
+                    <div>Chargement des cartes...</div>
                     <div>{percentage || 0}%</div>
                 </div>
             </ProgressBar>
@@ -39,15 +35,21 @@ const BigLoader = ({ requestProgress }) => {
 export default BigLoader
 
 const MainLoader = styled.div`
-    position        : relative;
+    position        : absolute;
+    top             : 0;
+    bottom          : 0;
+    left            : 0;
+    right           : 0;
     min-height      : 100vh;
     width           : 100vw;
     display         : flex;
     flex-direction  : column;
     align-items     : center;
     justify-content : center;
-    background      : var(--content);
+    background      : rgba(var(--content-rgb), 0.5);
+    backdrop-filter : blur(5px);
     overflow        : hidden;
+    z-index         : 10000;
 `
 
 const Loader = styled.div`
@@ -111,7 +113,6 @@ const ProgressBar = styled.div`
         position      : relative;
         height        : 6px;
         width         : 300px;
-        padding       : 0 5px;
         margin-top    : 15px;
         background    : var(--content-light);
         border-radius : var(--rounded-full);

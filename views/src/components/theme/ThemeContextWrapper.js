@@ -61,6 +61,7 @@ export default function ThemeContextWrapper(props) {
                 setTheme({ preference: 'prefers-color-scheme', theme: 'light' })
             }
         });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [window.matchMedia])
 
     /**

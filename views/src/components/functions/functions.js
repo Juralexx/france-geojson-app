@@ -1,30 +1,5 @@
 import { departements_regions, departments, old_regions, regions } from "./api"
 
-export const getZoom = (selectedType) => {
-    if (selectedType === 'France' || selectedType === 'Régions' || selectedType === 'Anciennes régions')
-        return 6
-    else if (selectedType === 'Départements')
-        return 9
-    else if (selectedType === 'Arrondissements')
-        return 11
-    else if (selectedType === 'Cantons')
-        return 12
-    else if (selectedType === 'Communes')
-        return 13
-    else if (regions.includes(selectedType))
-        return 8
-    else if (old_regions.includes(selectedType))
-        return 8
-    else if (departments.includes(selectedType))
-        return 9
-    else
-        return 6
-}
-
-/**
- * 
- */
-
 export const getLevel = (selectedLevel) => {
     if (selectedLevel === 'France')
         return 0
@@ -52,7 +27,8 @@ export const getLevel = (selectedLevel) => {
 
 export const getArborescence = (type, name, geojsons) => {
     switch (type) {
-        case ('Régions' || 'Anciennes régions'): {
+        case 'Régions':
+        case 'Anciennes régions': {
             const region = geojsons[name]
             return (
                 [{
@@ -112,16 +88,20 @@ export const getArborescence = (type, name, geojsons) => {
 export function getGeoJSONBounds(gj) {
     var coords, bbox;
     if (!gj.hasOwnProperty('type')) return;
-    coords = getCoordinatesDump(gj);
-    bbox = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY,];
-    return coords.reduce(function (prev, coord) {
-        return [
-            Math.min(coord[0], prev[0]),
-            Math.min(coord[1], prev[1]),
-            Math.max(coord[0], prev[2]),
-            Math.max(coord[1], prev[3])
-        ];
-    }, bbox);
+    if (gj.type !== 'Topology') {
+        coords = getCoordinatesDump(gj);
+        bbox = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY,];
+        return coords.reduce(function (prev, coord) {
+            return [
+                Math.min(coord[0], prev[0]),
+                Math.min(coord[1], prev[1]),
+                Math.max(coord[0], prev[2]),
+                Math.max(coord[1], prev[3])
+            ];
+        }, bbox);
+    } else {
+        return gj.bbox
+    }
 }
 
 export function getCoordinatesDump(gj) {
@@ -150,6 +130,8 @@ export function getCoordinatesDump(gj) {
         coords = gj.features.reduce(function (dump, f) {
             return dump.concat(getCoordinatesDump(f));
         }, []);
+    } else if (gj.type === 'Topology') {
+        coords = gj.bbox
     }
     return coords;
 }

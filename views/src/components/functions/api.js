@@ -11,7 +11,12 @@ export const regions = [
     'Nouvelle-Aquitaine',
     'Occitanie',
     'Pays de la Loire',
-    'Provence-Alpes-Côte d\'Azur'
+    'Provence-Alpes-Côte d\'Azur',
+    'Guadeloupe',
+    'Martinique',
+    'Guyane',
+    'La Réunion',
+    'Mayotte'
 ]
 
 export const old_regions = [
@@ -21,7 +26,7 @@ export const old_regions = [
     'Basse-Normandie',
     'Bourgogne',
     'Bretagne',
-    'Centre',
+    'Centre-Val de Loire',
     'Champagne-Ardenne',
     'Corse',
     'Franche-Comté',
@@ -36,7 +41,12 @@ export const old_regions = [
     'Picardie',
     'Poitou-Charentes',
     'Provence-Alpes-Côte d\'Azur',
-    'Rhône-Alpes'
+    'Rhône-Alpes',
+    'Guadeloupe',
+    'Martinique',
+    'Guyane',
+    'La Réunion',
+    'Mayotte'
 ]
 
 export const departments = [

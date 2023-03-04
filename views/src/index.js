@@ -5,11 +5,14 @@ import reportWebVitals from './test/reportWebVitals';
 import Head from "./Head";
 import { HelmetProvider } from "react-helmet-async";
 import ThemeContextWrapper from "./components/theme/ThemeContextWrapper";
+import GlobalStyles from "./styles/GlobalStyles";
+import './styles/font.css'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
     <React.StrictMode>
+        <GlobalStyles />
         <ThemeContextWrapper>
             <HelmetProvider>
                 <Head />
@@ -19,7 +22,4 @@ root.render(
     </React.StrictMode>
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
