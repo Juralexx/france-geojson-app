@@ -1,0 +1,1 @@
+{"type":"Topology","bbox":[6.6354,43.48007,7.71881,44.36105],"objects":{"collection":{"type":"GeometryCollection","geometries":[{"type":"MultiPolygon","arcs":[[[0]],[[1]],[[2,3]]],"properties":{"code":"06001","nom":"Grasse"}},{"type":"Polygon","arcs":[[-3,4]],"properties":{"code":"06002","nom":"Nice"}}]}},"arcs":[[],[],[],[],[]]}

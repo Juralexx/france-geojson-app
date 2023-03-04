@@ -1,0 +1,1 @@
+{"type":"Topology","bbox":[-1.52487,43.48764,0.13673,44.53219],"objects":{"collection":{"type":"GeometryCollection","geometries":[{"type":"Polygon","arcs":[[0,1]],"properties":{"code":"40001","nom":"Dax"}},{"type":"Polygon","arcs":[[2,-1]],"properties":{"code":"40002","nom":"Mont-de-Marsan"}}]}},"arcs":[[],[],[]]}

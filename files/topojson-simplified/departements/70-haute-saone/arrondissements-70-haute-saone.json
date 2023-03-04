@@ -1,0 +1,1 @@
+{"type":"Topology","bbox":[5.3673,47.25253,6.82494,48.02408],"objects":{"collection":{"type":"GeometryCollection","geometries":[{"type":"Polygon","arcs":[[0,1]],"properties":{"code":"70001","nom":"Lure"}},{"type":"Polygon","arcs":[[-2,2]],"properties":{"code":"70002","nom":"Vesoul"}}]}},"arcs":[[],[],[]]}

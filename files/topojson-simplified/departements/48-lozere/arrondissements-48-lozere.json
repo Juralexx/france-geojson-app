@@ -1,0 +1,1 @@
+{"type":"Topology","bbox":[2.98168,44.10928,3.99816,44.97554],"objects":{"collection":{"type":"GeometryCollection","geometries":[{"type":"Polygon","arcs":[[0,1]],"properties":{"code":"48001","nom":"Florac"}},{"type":"Polygon","arcs":[[-2,2]],"properties":{"code":"48002","nom":"Mende"}}]}},"arcs":[[],[],[]]}

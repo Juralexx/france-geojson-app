@@ -1,0 +1,1 @@
+{"type":"Topology","bbox":[1.37256,45.66336,2.61157,46.45525],"objects":{"collection":{"type":"GeometryCollection","geometries":[{"type":"Polygon","arcs":[[0,1]],"properties":{"code":"23001","nom":"Aubusson"}},{"type":"Polygon","arcs":[[-1,2]],"properties":{"code":"23002","nom":"Guéret"}}]}},"arcs":[[],[],[]]}

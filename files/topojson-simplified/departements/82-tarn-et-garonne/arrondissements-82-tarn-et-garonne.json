@@ -1,0 +1,1 @@
+{"type":"Topology","bbox":[0.73789,43.76768,2.00062,44.39378],"objects":{"collection":{"type":"GeometryCollection","geometries":[{"type":"Polygon","arcs":[[0,1],[2]],"properties":{"code":"82001","nom":"Castelsarrasin"}},{"type":"MultiPolygon","arcs":[[[-3]],[[3,-1]]],"properties":{"code":"82002","nom":"Montauban"}}]}},"arcs":[[],[],[],[]]}

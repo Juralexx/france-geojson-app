@@ -1,0 +1,1 @@
+{"type":"Topology","bbox":[1.53545,43.38315,2.93746,44.2013],"objects":{"collection":{"type":"GeometryCollection","geometries":[{"type":"Polygon","arcs":[[0,1]],"properties":{"code":"81001","nom":"Albi"}},{"type":"Polygon","arcs":[[2,-1]],"properties":{"code":"81002","nom":"Castres"}}]}},"arcs":[[],[],[]]}

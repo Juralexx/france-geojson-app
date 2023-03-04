@@ -1,0 +1,1 @@
+{"type":"Topology","bbox":[4.24399,45.45421,5.16021,46.30626],"objects":{"collection":{"type":"GeometryCollection","geometries":[{"type":"Polygon","arcs":[[0,1]],"properties":{"code":"69001","nom":"Lyon"}},{"type":"Polygon","arcs":[[-2,2]],"properties":{"code":"69002","nom":"Villefranche-sur-Saône"}}]}},"arcs":[[],[],[]]}
