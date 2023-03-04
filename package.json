@@ -2,18 +2,25 @@
     "name": "france-geojson-app",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "app.js",
     "type": "module",
     "scripts": {
-        "start": "concurrently \"npm run back\" \"npm run front\"",
-        "back": "nodemon server.js",
+        "start": "node app.js",
+        "dev": "concurrently \"npm run back\" \"npm run front\"",
+        "back": "nodemon app.js",
         "front": "npm start --prefix views"
     },
     "dependencies": {
+        "body-parser": "^1.20.2",
+        "compression": "^1.7.4",
         "concurrently": "^7.0.0",
         "cors": "^2.8.5",
         "dotenv": "^16.0.0",
         "express": "^4.18.2",
-        "nodemon": "^2.0.15"
+        "express-rate-limit": "^6.7.0",
+        "helmet": "^6.0.1",
+        "nodemon": "^2.0.15",
+        "topojson-server": "^3.0.1",
+        "topojson-simplify": "^3.0.3"
     }
 }
