@@ -146,8 +146,8 @@ const variables = css`
         --shadow-inset-left   : inset 7px 0 9px -7px rgba(0 0 0 / 15%);
 
         --font-fam-list : system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-        --font-fam1     : 'Poppins', var(--font-fam-list);
-        --font-fam2     : 'Poppins', var(--font-fam-list);
+        --font-fam1     : 'Mona Sans', var(--font-fam-list);
+        --font-fam2     : 'Mona Sans', var(--font-fam-list);
 
         --font-3xl : 24px;
         --font-2xl : 22px;
@@ -162,33 +162,9 @@ const variables = css`
         --easing     : cubic-bezier(0.645, 0.045, 0.355, 1);
         --transition : all 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
 
-        --facebook  : #1a478a;
-        --instagram : #c72a9d;
-        --twitter   : #55acef;
-        --snapchat  : #fffc00;
-        --youtube   : #e91e00;
-        --twitch    : #9147ff;
-        --pinterest : #cb2229;
-        --whatsapp  : #25D366;
-        --linkedin  : #007bb6;
-        --website   : var(--primary);
-
-        --nodejs    : #539e43;
-        --js        : #f7df1e;
-        --react     : #61dafb;
-        --redux     : #764abc;
-        --expressjs : #ffffff;
-        --html      : #f16528;
-        --css       : #2a65f1;
-        --bootstrap : #6b10f4;
-        --gulp      : #da4648;
-        --tailwind  : #38bdf8;
-        --stylus    : #ffffff;
-        --sass      : #cd6799;
-        --postman   : #ff6c37;
-
         --body            : #ffffff;
         --content         : #ffffff;
+        --content-rgb     : 255, 255, 255;
         --content-light   : #f9faff;
         --content-x-light : #ffffff;
 
@@ -234,6 +210,7 @@ const variables = css`
 
         --body            : var(--dark-navy);
         --content         : var(--navy);
+        --content-rgb     : var(--navy-rgb);
         --content-light   : var(--light-navy);
         --content-x-light : #ffffff;
 

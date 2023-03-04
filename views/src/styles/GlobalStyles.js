@@ -41,6 +41,13 @@ const GlobalStyles = createGlobalStyle`
         background-repeat : repeat;
         overflow-y        : auto;
         overflow-x        : hidden;
+
+        &.dark {
+            --map-tiles-filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+            .map-tiles {
+                filter : var(--map-tiles-filter, none);
+            }
+        }
     }
 
     ::selection {
@@ -137,6 +144,10 @@ const GlobalStyles = createGlobalStyle`
             font-size   : 16px;
             line-height : 20px;
         }
+    }
+
+    .highlight {
+        color : var(--primary);
     }
 `;
 
